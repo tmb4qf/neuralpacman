@@ -1,2 +1,2 @@
-# neuralpacman
-Training a neural network to play Pacman
+# Neural Pacman
+Training a neural network to play Pacman in the browser.
