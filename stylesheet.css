@@ -6,7 +6,7 @@ body{
 	height: 100%;
 }
 
-#pacmanMap{
+#canvas{
 	height: 576px;
 	width: 448px;
 	margin: 0 auto;

@@ -1,65 +1,86 @@
-var pacmanMap = document.getElementById('pacmanMap');
-var BOARD_WIDTH = pacmanMap.width;
-var BOARD_HEIGHT = pacmanMap.height;
 var SQUARE_SIZE = 16;
-var panel = new jsgl.Panel(pacmanMap);
+var PACMAN_START = 741.5;
+var BLINKY_START = 405.5;
+var PINKY_START = 489.5;
+var INKY_START = 487.5;
+var CLYDE_START = 491.5;
+var div = document.getElementById('canvas');
+var game1;
 
-//pacman object
-function Pacman(location){
-	this.location = location;
+function Location(x,y)
+{
+	this.x = x;
+	this.y = y;
 }
 
-Pacman.prototype.draw = function(squareNum){
-	this.location = squareNum;
+function Game(){	
+	this.pacman = new Agent(squareToPixels(PACMAN_START), 0, 0, '#FFFB14', 0);
+	this.blinky = new Agent(squareToPixels(BLINKY_START), 0, 0, '#FF1212',0);
+	this.pinky = new Agent(squareToPixels(PINKY_START), 0, 0, '#FFC9DC',0);
+	this.inky = new Agent(squareToPixels(INKY_START), 0, 0, '#A8FFFE',0);
+	this.clyde = new Agent(squareToPixels(CLYDE_START), 0, 0, '#FCC78D',0);
 	
-	circle = panel.createCircle();
-	var coords = squareToPixels(squareNum);
-	circle.setCenterLocationXY(coords[0], coords[1]);
-    circle.setRadius(13);
-    circle.getFill().setColor("rgb(255,251,0)");
-    panel.addElement(circle);
+	this.dots;
+	this.energizers;
+}
+
+Game.prototype.drawAgents = function(){
+	this.pacman.draw();
+	this.blinky.draw();
+	this.pinky.draw();
+	this.inky.draw();
+	this.clyde.draw();
+}
+
+
+function Agent(location, velocity, direction, color, state){
+	this.location = location;
+	this.velocity = velocity;
+	this.direction = direction;
+	this.color = color;
+	this.state = state;
+}
+
+Agent.prototype.updatePosition = function(){
+	
 };
 
-function Ghost(id){
-	this.id = id;
-	this.location = location;
-}
-
-Ghost.prototype.draw = function(squareNum, color){
-	this.location = squareNum;
-	
-	circle = panel.createCircle();
-	var coords = squareToPixels(squareNum);
-	circle.setCenterLocationXY(coords[0], coords[1]);
-    circle.setRadius(13);
-    circle.getFill().setColor(color);
-    panel.addElement(circle);
+Agent.prototype.draw = function(location){
+	fill(this.color);
+	noStroke();
+	ellipse(this.location.x, this.location.y, 28, 28);
+	console.log("Drawing Pacman");
 };
 
-main();
-function main(){
-	var pacman = new Pacman(575);
-	var blinky = new Ghost(400);
-	var pinky = new Ghost(403);
-	var inky = new Ghost(406);
-	var clyde = new Ghost(409);
-	
-	pacman.draw(575);
-	blinky.draw(400, 'rgb(247, 10, 10)');
-	pinky.draw(403, 'rgb(255, 173, 236)');
-	inky.draw(406, 'rgb(96, 252, 252)');
-	clyde.draw(409, 'rgb(255, 170, 79)');
-	
+function Dot(location, size){
+	this.location = location;
+	this.size = size;
 }
+
+
+function draw(){
+
+}
+
+function setup(){
+	canvas = createCanvas(div.scrollWidth, div.scrollHeight);
+	canvas.parent('canvas');
+	frameRate(30);
+	
+	game1 = new Game();
+	game1.drawAgents();
+}
+
 
 //Common useful functions
 function squareToPixels(squareNum){
 	var col = squareNum % 28;
-	var row = Math.ceil(squareNum / 28);
-	var x = (col * SQUARE_SIZE) - (.5 * SQUARE_SIZE);
-	var y = (row * SQUARE_SIZE) - (.5 * SQUARE_SIZE);
+	var row = Math.floor(squareNum / 28);
+	var x = (col * SQUARE_SIZE) + (.5 * SQUARE_SIZE);
+	var y = (row * SQUARE_SIZE) + (.5 * SQUARE_SIZE);
 	
-	return [x,y];
+	var loc = new Location(x,y);
+	return loc;
 }
 
 function pixelsToSquare(x, y){
@@ -68,3 +89,28 @@ function pixelsToSquare(x, y){
 	
 	return (row * 28 + col);
 }
+
+object.addEventListener("keypress", keyPress);
+
+function keyPress(){
+	e.preventDefault();
+	switch(e.keyCode) {
+		case 37:
+			
+		break;
+		case 38:
+			
+		break;
+		case 39:
+			
+		break;
+		case 40:
+			
+		break;
+}
+
+
+
+
+
+
