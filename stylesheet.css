@@ -6,25 +6,12 @@ body{
 	height: 100%;
 }
 
-#canvas{
+#pacmanMap{
 	height: 576px;
 	width: 448px;
 	margin: 0 auto;
-	display: block;
 	border: 2px solid black;
-
-  image-rendering: -moz-crisp-edges;          /* FF 6.0+                       */
-  image-rendering: -webkit-optimize-contrast; /* Safari                        */
-  image-rendering: -o-crisp-edges;            /* OS X & Windows Opera (12.02+) */
-  image-rendering: pixelated;                 /* Awesome future-browsers       */
-  -ms-interpolation-mode: nearest-neighbor;   /* IE                            */
-}
-
-#pacmanBoardImg{
-	width: 448px;
-	height: 576px;
-}
-
-.hidden{
-	visibility: hidden;
+	background-image: url('images/pacmanBoard.png');
+	background-size: 448px 576px;
+	background-repeat: no-repeat;
 }
