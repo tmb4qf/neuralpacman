@@ -4,6 +4,10 @@ var BLINKY_START = 405.5;
 var PINKY_START = 489.5;
 var INKY_START = 487.5;
 var CLYDE_START = 491.5;
+var UP = 1;
+var RIGHT = 2;
+var DOWN = 3;
+var LEFT = 4;
 var div = document.getElementById('canvas');
 var game1;
 
@@ -24,6 +28,14 @@ function Game(){
 	this.energizers;
 }
 
+Game.prototype.updateAgentsLocation = function(){
+	this.pacman.updateLocation();
+	this.blinky.updateLocation();
+	this.pinky.updateLocation();
+	this.inky.updateLocation();
+	this.clyde.updateLocation();
+}
+
 Game.prototype.drawAgents = function(){
 	this.pacman.draw();
 	this.blinky.draw();
@@ -41,15 +53,27 @@ function Agent(location, velocity, direction, color, state){
 	this.state = state;
 }
 
-Agent.prototype.updatePosition = function(){
-	
+Agent.prototype.updateLocation = function(){
+	switch(this.direction){
+		case UP:
+			this.location.x -= this.velocity * .03;
+			break;
+		case DOWN: 
+			this.location.x += this.velocity * .03;
+			break;
+		case RIGHT:
+			this.location.y += this.velocity * .03;
+			break;
+		case LEFT:
+			this.location.y -= this.velocity * .03;
+			break;
+	}
 };
 
 Agent.prototype.draw = function(location){
 	fill(this.color);
 	noStroke();
 	ellipse(this.location.x, this.location.y, 28, 28);
-	console.log("Drawing Pacman");
 };
 
 function Dot(location, size){
@@ -59,7 +83,9 @@ function Dot(location, size){
 
 
 function draw(){
-
+	clear();
+	game1.updateAgentsLocation();
+	game1.drawAgents();
 }
 
 function setup(){
@@ -70,6 +96,33 @@ function setup(){
 	game1 = new Game();
 	game1.drawAgents();
 }
+
+
+//event listener for arrow keys
+document.addEventListener("keydown", function(e){
+	e.preventDefault();
+	switch(e.keyCode) {
+		case 37:
+			game1.pacman.direction = UP;
+			game1.pacman.velocity = 80;
+		break;
+		case 38:
+			game1.pacman.direction = LEFT;
+			game1.pacman.velocity = 80;
+		break;
+		case 39:
+			game1.pacman.direction = DOWN;
+			game1.pacman.velocity = 80;
+		break;
+		case 40:
+			game1.pacman.direction = RIGHT;
+			game1.pacman.velocity = 80;
+		break;
+	}
+});
+
+
+
 
 
 //Common useful functions
@@ -88,25 +141,6 @@ function pixelsToSquare(x, y){
 	var row = Math.ceil(y / SQUARE_SIZE);
 	
 	return (row * 28 + col);
-}
-
-object.addEventListener("keypress", keyPress);
-
-function keyPress(){
-	e.preventDefault();
-	switch(e.keyCode) {
-		case 37:
-			
-		break;
-		case 38:
-			
-		break;
-		case 39:
-			
-		break;
-		case 40:
-			
-		break;
 }
 
 
