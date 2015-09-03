@@ -13,5 +13,5 @@ body{
 	border: 2px solid black;
 	background-image: url('images/pacmanBoard.png');
 	background-size: 448px 576px;
-	background-repeat: no-repeat;
+	background-repeat: no-repeat;	
 }
