@@ -5,16 +5,49 @@ var PINKY_START = 489.5;
 var INKY_START = 487.5;
 var CLYDE_START = 491.5;
 
-var UP = 1;
-var RIGHT = 2;
-var DOWN = 3;
-var LEFT = 4;
-
 var CHASE = 1;
 var SCATTER = 2;
 var FRIGHTENED = 3;
 
 var timing = [7,20,7,20,5,20,5];
+
+var pacmanMap = 	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+					 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+					 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+					 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+					 0,1,1,1,1,1,1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,0,
+					 0,1,0,0,0,0,1,0,0,0,0,0,1,0,0,1,0,0,0,0,0,1,0,0,0,0,1,0,
+					 0,1,0,0,0,0,1,0,0,0,0,0,1,0,0,1,0,0,0,0,0,1,0,0,0,0,1,0,
+					 0,1,0,0,0,0,1,0,0,0,0,0,1,0,0,1,0,0,0,0,0,1,0,0,0,0,1,0,
+					 0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,
+					 0,1,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,1,0,
+					 0,1,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,1,0,
+					 0,1,1,1,1,1,1,0,0,1,1,1,1,0,0,1,1,1,1,0,0,1,1,1,1,1,1,0,
+					 0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,
+					 0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,
+					 0,0,0,0,0,0,1,0,0,1,1,1,1,1,1,1,1,1,1,0,0,1,0,0,0,0,0,0,
+					 0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,
+					 0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,
+					 1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,
+					 0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,
+					 0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,
+					 0,0,0,0,0,0,1,0,0,1,1,1,1,1,1,1,1,1,1,0,0,1,0,0,0,0,0,0,
+					 0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,
+					 0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,
+					 0,1,1,1,1,1,1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,0,
+					 0,1,0,0,0,0,1,0,0,0,0,0,1,0,0,1,0,0,0,0,0,1,0,0,0,0,1,0,
+					 0,1,0,0,0,0,1,0,0,0,0,0,1,0,0,1,0,0,0,0,0,1,0,0,0,0,1,0,
+					 0,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,1,1,1,0,
+					 0,0,0,1,0,0,1,0,0,1,0,0,0,0,0,0,0,0,1,0,0,1,0,0,1,0,0,0,
+					 0,0,0,1,0,0,1,0,0,1,0,0,0,0,0,0,0,0,1,0,0,1,0,0,1,0,0,0,
+					 0,1,1,1,1,1,1,0,0,1,1,1,1,0,0,1,1,1,1,0,0,1,1,1,1,1,1,0,
+					 0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,
+					 0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,
+					 0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,
+					 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+					 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+					 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+
 var div = document.getElementById('canvas');
 var game1;
 
@@ -66,6 +99,7 @@ Game.prototype.changeMode = function(mode){
 		this.inky.color = '#2F1CFF';
 		this.clyde.color = '#2F1CFF';
 		
+		this.pacman.velocity = 90;
 		this.blinky.velocity = 50;
 		this.pinky.velocity = 50;
 		this.inky.velocity = 50;
@@ -77,6 +111,7 @@ Game.prototype.changeMode = function(mode){
 		this.inky.color = '#78FFFE';
 		this.clyde.color = '#FFC17D';
 		
+		this.pacman.velocity = 80;
 		this.blinky.velocity = 75;
 		this.pinky.velocity = 75;
 		this.inky.velocity = 75;
@@ -95,13 +130,13 @@ function Agent(location, velocity, direction, color, mode, traversal){
 }
 
 Agent.prototype.updateLocation = function(){
-	this.traversal(this.location, this.direction, this.velocity);
+	this.traversal();
 };
 
 Agent.prototype.draw = function(){
 	fill(this.color);
 	noStroke();
-	ellipse(this.location.x, this.location.y, 28, 28);
+	ellipse(this.location.x, this.location.y, 25, 25);
 };
 
 function Dot(location, size){
@@ -150,19 +185,19 @@ function scatterMode(){
 }
 
 
-function pacmanTrav(location, direction, velocity){
-	switch(direction){
-		case UP:
-			location.x -= velocity * .03;
+function pacmanTrav(){
+	switch(game1.pacman.direction){
+		case 1:
+			game1.pacman.location.y -= game1.pacman.velocity * .03;
 			break;
-		case DOWN: 
-			location.x += velocity * .03;
+		case 2:
+			game1.pacman.location.x += game1.pacman.velocity * .03;
 			break;
-		case RIGHT:
-			location.y += velocity * .03;
+		case 3: 
+			game1.pacman.location.y += game1.pacman.velocity * .03;
 			break;
-		case LEFT:
-			location.y -= velocity * .03;
+		case 4:
+			game1.pacman.location.x -= game1.pacman.velocity * .03;
 			break;
 	}
 }
@@ -188,20 +223,20 @@ document.addEventListener("keydown", function(e){
 	e.preventDefault();
 	switch(e.keyCode) {
 		case 37:
-			game1.pacman.direction = UP;
-			game1.pacman.velocity = 80;
+			if(allowDirChange(game1.pacman, 4))
+				game1.pacman.direction = 4;
 		break;
 		case 38:
-			game1.pacman.direction = LEFT;
-			game1.pacman.velocity = 80;
+			if(allowDirChange(game1.pacman, 1))
+				game1.pacman.direction = 1;
 		break;
 		case 39:
-			game1.pacman.direction = DOWN;
-			game1.pacman.velocity = 80;
+			if(allowDirChange(game1.pacman, 2))
+				game1.pacman.direction = 2;
 		break;
 		case 40:
-			game1.pacman.direction = RIGHT;
-			game1.pacman.velocity = 80;
+			if(allowDirChange(game1.pacman, 3))
+				game1.pacman.direction = 3;
 		break;
 		case 13:
 			game1.pacman.velocity = 0;
@@ -217,6 +252,7 @@ document.addEventListener("keydown", function(e){
 function squareToPixels(squareNum){
 	var col = squareNum % 28;
 	var row = Math.floor(squareNum / 28);
+	
 	var x = (col * SQUARE_SIZE) + (.5 * SQUARE_SIZE);
 	var y = (row * SQUARE_SIZE) + (.5 * SQUARE_SIZE);
 	
@@ -224,12 +260,56 @@ function squareToPixels(squareNum){
 	return loc;
 }
 
-function pixelsToSquare(x, y){
-	var col = Math.ceil(x / SQUARE_SIZE);
-	var row = Math.ceil(y / SQUARE_SIZE);
-	
+function pixelsToSquare(location){
+	var col = Math.floor(location.x / SQUARE_SIZE);
+	var row = Math.floor(location.y / SQUARE_SIZE);
 	return (row * 28 + col);
 }
+
+function spacePosition(location){
+	var x = location.x % SQUARE_SIZE;
+	var y = location.y % SQUARE_SIZE;
+	var space = new Location(x,y);
+	return space;
+}
+
+function allowDirChange(agent, attemptedDir){
+	var currentSquare = pixelsToSquare(agent.location);
+	var attemptedSquare;
+	
+	switch(attemptedDir){
+		case 1:
+			attemptedSquare = currentSquare - 28;
+			break;
+		case 2:
+			attemptedSquare = currentSquare + 1;
+			break;
+		case 3:
+			attemptedSquare = currentSquare + 28;
+			break;
+		case 4:
+			attemptedSquare = currentSquare - 1;
+			break;
+	}
+	console.log(currentSquare + ", " + attemptedSquare);
+	
+	if(pacmanMap[attemptedSquare] == 1){
+		centerAgent(agent);
+		return true;
+	}
+	else{
+		console.log("NOPE");
+		return false;
+	}
+}
+
+function centerAgent(agent){
+	var space = spacePosition(agent.location);
+	agent.location.x += (8-space.x);
+	agent.location.y += (8-space.y);
+}
+
+
 
 
 
