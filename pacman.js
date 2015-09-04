@@ -308,11 +308,3 @@ function centerAgent(agent){
 	agent.location.x += (8-space.x);
 	agent.location.y += (8-space.y);
 }
-
-
-
-
-
-
-
-
