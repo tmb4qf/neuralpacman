@@ -58,11 +58,11 @@ function Location(x,y)
 }
 
 function Game(){	
-	this.pacman = new Agent(squareToPixels(PACMAN_START), 80, 0, '#FFFB14', 0, pacmanTrav);
-	this.blinky = new Agent(squareToPixels(BLINKY_START), 75, 0, '#FF1212',0, blinkyTrav);
-	this.pinky = new Agent(squareToPixels(PINKY_START), 75, 0, '#FFA8C7',0, pinkyTrav);
-	this.inky = new Agent(squareToPixels(INKY_START), 75, 0, '#78FFFE',0, inkyTrav);
-	this.clyde = new Agent(squareToPixels(CLYDE_START), 75, 0, '#FFC17D',0, clydeTrav);
+	this.pacman = new Agent(squareToPixels(PACMAN_START), 80, 0, '#FFFB14', 0, pacmanTrav, 0, 0);
+	this.blinky = new Agent(squareToPixels(BLINKY_START), 75, 0, '#FF1212',0, blinkyTrav, 0, 26);
+	this.pinky = new Agent(squareToPixels(PINKY_START), 75, 0, '#FFA8C7',0, pinkyTrav, 0, 2);
+	this.inky = new Agent(squareToPixels(INKY_START), 75, 0, '#78FFFE',0, inkyTrav, 0, 1007);
+	this.clyde = new Agent(squareToPixels(CLYDE_START), 75, 0, '#FFC17D',0, clydeTrav, 0, 980);
 	
 	this.dots;
 	this.energizers;
@@ -120,13 +120,15 @@ Game.prototype.changeMode = function(mode){
 }
 
 
-function Agent(location, velocity, direction, color, mode, traversal){
+function Agent(location, velocity, direction, color, mode, traversal, turning, target){
 	this.location = location;
 	this.velocity = velocity;
 	this.direction = direction;
 	this.color = color;
 	this.mode = mode;
 	this.traversal = traversal;
+	this.turning = turning;
+	this.target = target;
 }
 
 Agent.prototype.updateLocation = function(){
@@ -142,6 +144,111 @@ Agent.prototype.draw = function(){
 function Dot(location, size){
 	this.location = location;
 	this.size = size;
+}
+
+function pacmanTrav(){
+	var agent = game1.pacman;
+	var space = spacePosition(agent.location);
+	if(validMove(agent, agent.direction) || !isCentered(space, agent.direction)){
+		switch(agent.direction){
+			case 1:
+				agent.location.y -= agent.velocity * .04;
+				break;
+			case 2:
+				agent.location.x += agent.velocity * .04;
+				break;
+			case 3: 
+				agent.location.y += agent.velocity * .04;
+				break;
+			case 4:
+				agent.location.x -= agent.velocity * .04;
+				break;
+		}
+	}
+	if(agent.turning){
+		center(agent, space);
+		agent.turning = false;
+	}
+}
+
+function center(agent, space)
+{
+	switch(agent.direction){
+		case 1:
+		case 3:
+			agent.location.x += (.5 * SQUARE_SIZE - space.x);
+			break;
+		case 2:
+		case 4:
+			agent.location.y += (.5 * SQUARE_SIZE - space.y);
+			break;
+	}
+	
+}
+
+function validMove(agent, dir){
+	var currentSquare = pixelsToSquare(agent.location);
+	var attemptedSquare;
+	
+	switch(dir){
+		case 1:
+			attemptedSquare = currentSquare - 28;
+			break;
+		case 2:
+			attemptedSquare = currentSquare + 1;
+			break;
+		case 3:
+			attemptedSquare = currentSquare + 28;
+			break;
+		case 4:
+			attemptedSquare = currentSquare - 1;
+			break;
+	}
+	
+	if(pacmanMap[attemptedSquare] == 1){
+		return true;
+	}
+	else{
+		return false;
+	}
+}
+
+function isCentered(space, dir){
+	switch(dir){
+		case 1:
+			if(space.y <= (.6 * SQUARE_SIZE))
+				return true;
+			break;
+		case 2:
+			if(space.x >= (.4 * SQUARE_SIZE))
+				return true;
+			break;
+		case 3:
+			if(space.y >= (.4 * SQUARE_SIZE))
+				return true;
+			break;
+		case 4:
+			if(space.x <= (.6 * SQUARE_SIZE))
+				return true;
+			break;
+	}
+	return false;
+}
+
+function blinkyTrav(){
+	
+}
+
+function pinkyTrav(){
+	
+}
+
+function inkyTrav(){
+	
+}
+
+function clydeTrav(){
+	
 }
 
 
@@ -174,6 +281,7 @@ function chaseMode(){
 	{
 		game1.changeMode(CHASE);
 	}
+	console.log("CHASE");
 }
 
 function scatterMode(){
@@ -182,64 +290,37 @@ function scatterMode(){
 		game1.changeMode(SCATTER);
 		timing.splice(0,1);
 	}
+	console.log("SCATTER");
 }
 
-
-function pacmanTrav(){
-	switch(game1.pacman.direction){
-		case 1:
-			game1.pacman.location.y -= game1.pacman.velocity * .03;
-			break;
-		case 2:
-			game1.pacman.location.x += game1.pacman.velocity * .03;
-			break;
-		case 3: 
-			game1.pacman.location.y += game1.pacman.velocity * .03;
-			break;
-		case 4:
-			game1.pacman.location.x -= game1.pacman.velocity * .03;
-			break;
-	}
-}
-
-function blinkyTrav(){
-	
-}
-
-function pinkyTrav(){
-	
-}
-
-function inkyTrav(){
-	
-}
-
-function clydeTrav(){
-	
-}
 
 //event listener for arrow keys
 document.addEventListener("keydown", function(e){
 	e.preventDefault();
 	switch(e.keyCode) {
 		case 37:
-			if(allowDirChange(game1.pacman, 4))
+			if(validMove(game1.pacman, 4)){
 				game1.pacman.direction = 4;
+				game1.pacman.turning = true;
+			}
 		break;
 		case 38:
-			if(allowDirChange(game1.pacman, 1))
+			if(validMove(game1.pacman, 1)){
 				game1.pacman.direction = 1;
+				game1.pacman.turning = true;
+			}
 		break;
 		case 39:
-			if(allowDirChange(game1.pacman, 2))
+			if(validMove(game1.pacman, 2)){
 				game1.pacman.direction = 2;
+				game1.pacman.turning = true;
+			}
 		break;
 		case 40:
-			if(allowDirChange(game1.pacman, 3))
+			if(validMove(game1.pacman, 3)){
 				game1.pacman.direction = 3;
-		break;
-		case 13:
-			game1.pacman.velocity = 0;
+				game1.pacman.turning = true;
+			}
 		break;
 	}
 });
@@ -271,40 +352,4 @@ function spacePosition(location){
 	var y = location.y % SQUARE_SIZE;
 	var space = new Location(x,y);
 	return space;
-}
-
-function allowDirChange(agent, attemptedDir){
-	var currentSquare = pixelsToSquare(agent.location);
-	var attemptedSquare;
-	
-	switch(attemptedDir){
-		case 1:
-			attemptedSquare = currentSquare - 28;
-			break;
-		case 2:
-			attemptedSquare = currentSquare + 1;
-			break;
-		case 3:
-			attemptedSquare = currentSquare + 28;
-			break;
-		case 4:
-			attemptedSquare = currentSquare - 1;
-			break;
-	}
-	console.log(currentSquare + ", " + attemptedSquare);
-	
-	if(pacmanMap[attemptedSquare] == 1){
-		centerAgent(agent);
-		return true;
-	}
-	else{
-		console.log("NOPE");
-		return false;
-	}
-}
-
-function centerAgent(agent){
-	var space = spacePosition(agent.location);
-	agent.location.x += (8-space.x);
-	agent.location.y += (8-space.y);
 }
