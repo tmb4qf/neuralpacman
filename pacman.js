@@ -10,6 +10,7 @@ var SCATTER = 2;
 var FRIGHTENED = 3;
 
 var timing = [7,20,7,20,5,20,5];
+var intersection = [118,133,225,230,233,236,239,242,245,250,314,329,404,407,482,485,494,497,569,579,650,653,662,665,734,737,740,743,744,747,815,836,936,939];
 
 var pacmanMap = 	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 					 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -58,11 +59,11 @@ function Location(x,y)
 }
 
 function Game(){	
-	this.pacman = new Agent(squareToPixels(PACMAN_START), 80, 0, '#FFFB14', 0, pacmanTrav, 0, 0);
-	this.blinky = new Agent(squareToPixels(BLINKY_START), 75, 0, '#FF1212',0, blinkyTrav, 0, 26);
-	this.pinky = new Agent(squareToPixels(PINKY_START), 75, 0, '#FFA8C7',0, pinkyTrav, 0, 2);
-	this.inky = new Agent(squareToPixels(INKY_START), 75, 0, '#78FFFE',0, inkyTrav, 0, 1007);
-	this.clyde = new Agent(squareToPixels(CLYDE_START), 75, 0, '#FFC17D',0, clydeTrav, 0, 980);
+	this.pacman = new Agent(squareToPixels(PACMAN_START), 80, 0, '#FFFB14', 0, pacmanTrav, null, 0, 0, null);
+	this.blinky = new Agent(squareToPixels(BLINKY_START), 75, 4, '#FF1212',0, ghostTrav, blinkyAlgo, 0, 26, null);
+	this.pinky = new Agent(squareToPixels(PINKY_START), 75, 0, '#FFA8C7',0, ghostTrav, pinkyAlgo, 0, 2, null);
+	this.inky = new Agent(squareToPixels(INKY_START), 75, 0, '#78FFFE',0, ghostTrav, inkyAlgo, 0, 1007, null);
+	this.clyde = new Agent(squareToPixels(CLYDE_START), 75, 0, '#FFC17D',0, ghostTrav, clydeAlgo, 0, 980, null);
 	
 	this.dots;
 	this.energizers;
@@ -120,20 +121,39 @@ Game.prototype.changeMode = function(mode){
 }
 
 
-function Agent(location, velocity, direction, color, mode, traversal, turning, target){
+function Agent(location, velocity, direction, color, mode, traversal, algo, turning, target, nextDir){
 	this.location = location;
 	this.velocity = velocity;
 	this.direction = direction;
 	this.color = color;
 	this.mode = mode;
 	this.traversal = traversal;
+	this.algo = algo;
 	this.turning = turning;
 	this.target = target;
+	this.nextDir = nextDir;
 }
 
 Agent.prototype.updateLocation = function(){
 	this.traversal();
 };
+
+Agent.prototype.moveStep = function(){
+	switch(this.direction){
+		case 1:
+			this.location.y -= this.velocity * .04;
+			break;
+		case 2:
+			this.location.x += this.velocity * .04;
+			break;
+		case 3: 
+			this.location.y += this.velocity * .04;
+			break;
+		case 4:
+			this.location.x -= this.velocity * .04;
+			break;
+	}	
+}
 
 Agent.prototype.draw = function(){
 	fill(this.color);
@@ -150,25 +170,112 @@ function pacmanTrav(){
 	var agent = game1.pacman;
 	var space = spacePosition(agent.location);
 	if(validMove(agent, agent.direction) || !isCentered(space, agent.direction)){
-		switch(agent.direction){
-			case 1:
-				agent.location.y -= agent.velocity * .04;
-				break;
-			case 2:
-				agent.location.x += agent.velocity * .04;
-				break;
-			case 3: 
-				agent.location.y += agent.velocity * .04;
-				break;
-			case 4:
-				agent.location.x -= agent.velocity * .04;
-				break;
-		}
+		agent.moveStep();
 	}
 	if(agent.turning){
 		center(agent, space);
 		agent.turning = false;
 	}
+}
+
+function ghostTrav(){
+	var agent = this;
+	var currentSquare = pixelsToSquare(agent.location);
+	var next = nextSquare(agent.direction, currentSquare);
+	var space = spacePosition(agent.location);
+
+	if(agent.nextDir != null){
+		if(validMove(agent, agent.nextDir) && isCentered(space, agent.direction)){
+			agent.direction = agent.nextDir;
+			agent.nextDir = null;
+			agent.moveStep();
+		}
+		else{
+			agent.moveStep();
+		}
+	}
+	else if(intersection.indexOf(next) > 0){
+		agent.target = this.algo();
+		var adjSquare = adjSquares(next);
+		dirToTarget(agent, adjSquare);
+		if(validMove(agent, agent.direction)){
+			agent.moveStep();
+		}
+	}
+	else if(validMove(agent, agent.direction)){
+		agent.moveStep();
+	}
+	else{
+		var oppDir = oppositeDir(agent.direction);
+		if(!isCentered(space, agent.direction))
+			agent.moveStep();
+		else{
+			for(var i = 1; i <= 4; ++i){
+				if(i != oppDir && pacmanMap[nextSquare(i, currentSquare)] == 1){
+					agent.direction = i;
+					center(agent, spacePosition(agent.location));
+				}
+			}
+		}
+	}
+}
+
+function dirToTarget(agent, adjSquare){
+	var min = -1;
+	var dir;
+	var oppDir = oppositeDir(agent.direction);
+	for(var i = 0; i < 4; ++i){
+		if((i+1) != oppDir && adjSquare[i] >= 0){
+			var dist = distance(squareToPixels(agent.target), squareToPixels(adjSquare[i]));
+			if(dist < min || min == -1){
+				min = dist;
+				dir = i + 1;
+			}
+		}	
+	}
+	agent.nextDir = dir;
+}
+
+function adjSquares(square){
+	var adjSquare= []
+	
+	if(pacmanMap[square - 28] == 1)
+		adjSquare.push(square - 28);
+	else
+		adjSquare.push(-1);
+	
+	if(pacmanMap[square + 1] == 1)
+		adjSquare.push(square + 1);
+	else
+		adjSquare.push(-1);
+	
+	if(pacmanMap[square + 28] == 1)
+		adjSquare.push(square + 28);
+	else
+		adjSquare.push(-1);
+	
+	if(pacmanMap[square - 1] == 1)
+		adjSquare.push(square - 1);
+	else
+		adjSquare.push(-1);
+	
+	return adjSquare;
+}
+
+function blinkyAlgo(){
+	return 26;
+}
+
+function pinkyAlgo(){
+	return 2;
+}
+
+function inkyAlgo(){
+	return 1007;
+}
+
+function clydeAlgo(){
+	return 980;
 }
 
 function center(agent, space)
@@ -186,10 +293,8 @@ function center(agent, space)
 	
 }
 
-function validMove(agent, dir){
-	var currentSquare = pixelsToSquare(agent.location);
+function nextSquare(dir, currentSquare){
 	var attemptedSquare;
-	
 	switch(dir){
 		case 1:
 			attemptedSquare = currentSquare - 28;
@@ -204,6 +309,12 @@ function validMove(agent, dir){
 			attemptedSquare = currentSquare - 1;
 			break;
 	}
+	return attemptedSquare;
+}
+
+function validMove(agent, dir){
+	var currentSquare = pixelsToSquare(agent.location);
+	var attemptedSquare = nextSquare(dir, currentSquare);
 	
 	if(pacmanMap[attemptedSquare] == 1){
 		return true;
@@ -233,22 +344,6 @@ function isCentered(space, dir){
 			break;
 	}
 	return false;
-}
-
-function blinkyTrav(){
-	
-}
-
-function pinkyTrav(){
-	
-}
-
-function inkyTrav(){
-	
-}
-
-function clydeTrav(){
-	
 }
 
 
@@ -352,4 +447,26 @@ function spacePosition(location){
 	var y = location.y % SQUARE_SIZE;
 	var space = new Location(x,y);
 	return space;
+}
+
+function distance(loc1, loc2){
+	var dist = Math.sqrt(Math.pow(loc1.x - loc2.x, 2) + Math.pow(loc1.y - loc2.y, 2));
+	return dist;
+}
+
+function oppositeDir(dir){
+	switch(dir){
+		case 1:
+			return 3;
+			break;
+		case 2:
+			return 4;
+			break;
+		case 3:
+			return 1;
+			break;
+		case 4:
+			return 2;
+			break;
+	}
 }
