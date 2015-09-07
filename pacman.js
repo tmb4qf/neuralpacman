@@ -189,9 +189,9 @@ function ghostTrav(){
 	
 	if((currentSquare >= 476 && currentSquare <= 480) || (currentSquare >= 499 && currentSquare <= 503))
 		agent.velocity = 40;
-	else if(mode == CHASE || mode == SCATTER)
+	else if(agent.mode == CHASE || agent.mode == SCATTER)
 		agent.velocity = 75;
-	else if(mode == FRIGHTENED)
+	else if(agent.mode == FRIGHTENED)
 		agent.velocity = 50;
 	
 	var next = nextSquare(agent.direction, currentSquare);
