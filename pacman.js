@@ -144,12 +144,18 @@ Agent.prototype.moveStep = function(){
 			this.location.y -= this.velocity * .05;
 			break;
 		case 2:
+			if(pixelsToSquare(this.location) == 503){
+				this.location = squareToPixels(476);
+			}
 			this.location.x += this.velocity * .05;
 			break;
 		case 3: 
 			this.location.y += this.velocity * .05;
 			break;
 		case 4:
+			if(pixelsToSquare(this.location) == 476){
+				this.location = squareToPixels(503);
+			}
 			this.location.x -= this.velocity * .05;
 			break;
 	}	
@@ -180,6 +186,14 @@ function pacmanTrav(){
 function ghostTrav(){
 	var agent = this;
 	var currentSquare = pixelsToSquare(agent.location);
+	
+	if((currentSquare >= 476 && currentSquare <= 480) || (currentSquare >= 499 && currentSquare <= 503))
+		agent.velocity = 40;
+	else if(mode == CHASE || mode == SCATTER)
+		agent.velocity = 75;
+	else if(mode == FRIGHTENED)
+		agent.velocity = 50;
+	
 	var next = nextSquare(agent.direction, currentSquare);
 	var space = spacePosition(agent.location);
 
