@@ -59,11 +59,11 @@ function Location(x,y)
 }
 
 function Game(){	
-	this.pacman = new Agent(squareToPixels(PACMAN_START), 80, 0, '#FFFB14', 0, pacmanTrav, null, 0, 0, null);
-	this.blinky = new Agent(squareToPixels(BLINKY_START), 75, 4, '#FF1212',0, ghostTrav, blinkyAlgo, 0, 26, null);
-	this.pinky = new Agent(squareToPixels(PINKY_START), 75, 1, '#FFA8C7',0, ghostTrav, pinkyAlgo, 0, 2, null);
-	this.inky = new Agent(squareToPixels(INKY_START), 75, 2, '#78FFFE',0, ghostTrav, inkyAlgo, 0, 1007, 1);
-	this.clyde = new Agent(squareToPixels(CLYDE_START), 75, 4, '#FFC17D',0, ghostTrav, clydeAlgo, 0, 980, 1);
+	this.pacman = new Agent(squareToPixels(PACMAN_START), 80, 4, '#FFFB14', 0, pacmanTrav, null, 0, 0, null);
+	this.blinky = new Agent(squareToPixels(BLINKY_START), 75, 4, '#FF1212', SCATTER, ghostTrav, blinkyAlgo, 0, 26, null);
+	this.pinky = new Agent(squareToPixels(PINKY_START), 75, 1, '#FFA8C7', SCATTER, ghostTrav, pinkyAlgo, 0, 2, null);
+	this.inky = new Agent(squareToPixels(INKY_START), 75, 2, '#78FFFE', SCATTER, ghostTrav, inkyAlgo, 0, 979, 1);
+	this.clyde = new Agent(squareToPixels(CLYDE_START), 75, 4, '#FFC17D', SCATTER, ghostTrav, clydeAlgo, 0, 952, 1);
 	
 	this.dots;
 	this.energizers;
@@ -262,19 +262,78 @@ function adjSquares(square){
 }
 
 function blinkyAlgo(){
-	return 26;
+	if(game1.blinky.mode == CHASE){
+		
+		var target = pixelsToSquare(game1.pacman.location);
+		return target;
+	}
+	else if(game1.blinky.mode == SCATTER){
+		return 26;
+	}
 }
 
 function pinkyAlgo(){
-	return 2;
+	if(game1.pinky.mode == CHASE){
+		var target;
+		switch(game1.pinky.direction){
+			case 1:
+				target = pixelsToSquare(game1.pacman.location) - (28 * 4) - 4;
+				break;
+			case 2:
+				target = pixelsToSquare(game1.pacman.location) + 4;
+				break;
+			case 3:
+				target = pixelsToSquare(game1.pacman.location) + (28 * 4);
+				break;
+			case 4:
+				target = pixelsToSquare(game1.pacman.location) - 4;
+				break;
+		}
+		return target;
+	}
+	else if(game1.pinky.mode == SCATTER){
+		return 2;
+	}
 }
 
 function inkyAlgo(){
-	return 1007;
+	if(game1.inky.mode == CHASE){
+		var midpoint;
+		switch(game1.pacman.direction){
+			case 1:
+				midpoint = pixelsToSquare(game1.pacman.location) - (28 * 2) - 2;
+				break;
+			case 2:
+				midpoint = pixelsToSquare(game1.pacman.location) + 2;
+				break;
+			case 3:
+				midpoint= pixelsToSquare(game1.pacman.location) + (28 * 2);
+				break;
+			case 4:
+				midpoint = pixelsToSquare(game1.pacman.location) - 2;
+				break;
+		}
+		var midPix = squareToPixels(midpoint);
+		var blinkyLoc = game1.blinky.location;
+
+		var x = 2 * (midPix.x - blinkyLoc.x) + blinkyLoc.x;
+		var y = 2 * (midPix.y - blinkyLoc.y) + blinkyLoc.y;
+		var loc = new Location(x,y);
+		var target = pixelsToSquare(loc);
+		return target;
+	}
+	else if(game1.inky.mode == SCATTER){
+		return 979;
+	}
 }
 
 function clydeAlgo(){
-	return 980;
+	var agent = game1.clyde;
+	if(agent.mode == CHASE && distance(game1.pacman.location, agent.location) > (8 * SQUARE_SIZE)){
+		var target = pixelsToSquare(game1.pacman.location);
+		return target;
+	}
+	return 952;
 }
 
 function center(agent, space)
@@ -436,6 +495,18 @@ function squareToPixels(squareNum){
 }
 
 function pixelsToSquare(location){
+	var square;
+	
+	if(location.x < 0)
+		location.x = 0;
+	else if(location.x > SQUARE_SIZE * 28)
+		location.x = SQUARE_SIZE * 28;
+	
+	if(location.y < 0)
+		location.y = 0;
+	else if(location.y > SQUARE_SIZE * 36)
+		location.y = SQUARE_SIZE * 36;
+	
 	var col = Math.floor(location.x / SQUARE_SIZE);
 	var row = Math.floor(location.y / SQUARE_SIZE);
 	return (row * 28 + col);
