@@ -59,7 +59,7 @@ function Location(x,y)
 	this.y = y;
 }
 
-function Game(mode){	
+function Game(){	
 	this.pacman = new Agent(squareToPixels(PACMAN_START), 0, 4, '#FFFB14', 0, pacmanTrav, null, 0, 0, null);
 	this.blinky = new Agent(squareToPixels(BLINKY_START), 0, 4, '#FF1212', SCATTER, ghostTrav, blinkyAlgo, 0, 26, null);
 	this.pinky = new Agent(squareToPixels(PINKY_START), 0, 1, '#FFA8C7', SCATTER, ghostTrav, pinkyAlgo, 0, 2, null);
@@ -68,7 +68,7 @@ function Game(mode){
 	
 	this.dots;
 	this.energizers;
-	this.mode = RESET;
+	this.mode;
 	this.lives = 3;
 	this.timer = 0;
 	this.score = 0;
@@ -214,28 +214,6 @@ function eatenPacman(game, currentSquare){
 	var pacman = game.pacman;
 	if(currentSquare == pixelsToSquare(pacman.location))
 		lifeLost(game);
-}
-
-function lifeLost(game){
-	
-	if(game.lives > 1){
-		game.changeMode(RESET);
-		clearInterval(stopwatch1);
-		setTimeout(function(){
-			game.pacman.location = squareToPixels(PACMAN_START);
-			game.blinky.location = squareToPixels(BLINKY_START);
-			game.pinky.location = squareToPixels(PINKY_START);
-			game.inky.location = squareToPixels(INKY_START);
-			game.clyde.location = squareToPixels(CLYDE_START);
-			
-			clear();
-			game1.lives--;
-			game.drawAgents();
-		}, 2000);
-	}
-	else{
-		game.changeMode(RESET);
-	}
 }
 
 function ghostTrav(){
@@ -471,12 +449,10 @@ function isCentered(space, dir){
 
 
 function draw(){
-	if(game1.mode != RESET){
 		keyCheck();
 		clear();
 		game1.updateAgentsLocation();
 		game1.drawAgents();
-	}
 	
 	for(var i=0; i < game1.lives - 1; ++i){
 		fill('#FFFB14');
@@ -497,15 +473,55 @@ function setup(){
 	noStroke();
 	
 	
-	game1 = new Game(RESET);
+	game1 = new Game();
+	game1.changeMode(RESET);
 	game1.drawAgents();
+	noLoop();
 }
 
-function startGame(){
+function lifeLost(game){
+	noLoop();
+	clearInterval(stopwatch1);
+	game.timer = 0;
+	game.changeMode(RESET);
+	game.lives--;
+	
+	if(game.lives > 0){
+		setTimeout(function(){
+			game.pacman.location = squareToPixels(PACMAN_START);
+			game.pacman.direction = 4;
+			
+			game.blinky.location = squareToPixels(BLINKY_START);
+			game.blinky.direction = 4;
+			
+			game.pinky.location = squareToPixels(PINKY_START);
+			game.pinky.direction = 1;
+			
+			game.inky.location = squareToPixels(INKY_START);
+			game.inky.direction = 2;
+			game.inky.nextDir = 1;
+			
+			game.clyde.location = squareToPixels(CLYDE_START);
+			game.clyde.direction = 4;
+			game.clyde.nextDir = 1;
+			
+			clear();
+			game.drawAgents();
+		}, 2000);
+	}
+	else{
+		console.log("dead");
+		clear();
+	}
+}
+
+function newLife(){
+	loop();
 	game1.changeMode(SCATTER);
 	console.log("SCATTER");
 	stopwatch1 = setInterval(function(){
 		game1.timer++;
+		console.log(game1.timer);
 		if(game1.timer == 7 || game1.timer == 34 || game1.timer == 59 || game1.timer == 84){
 			game1.changeMode(CHASE);
 			game1.reverseDirection();
@@ -518,7 +534,6 @@ function startGame(){
 		}
 	}, 1000);
 }
-
 
 function keyCheck(){
 	if(keyIsDown(LEFT_ARROW)){
