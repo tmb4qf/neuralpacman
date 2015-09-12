@@ -5,11 +5,22 @@
 		<link href="stylesheet.css" rel="stylesheet"></link>
 	</head>
 	<body>
-		<div id="canvas"></div>
-		<button onclick="newLife()">Start</button>
+		<div id="container">
+			<div id="canvas1" class="canvas"></div>
+			<div id="canvas2" class="canvas"></div>
+		</div>
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-		<script src="lib/jsgl.min.js"></script>
 		<script src="lib/p5.min.js"></script>
 		<script src="pacman.js"></script>
+		<script>
+			var width = window.innerWidth;
+			var height = window.innerHeight;
+			
+			$('.canvas').height(height).width(height * .777777777).css("background-size", height * .777777777 + "px " + height + "px");
+			
+			var SQUARE_SIZE = height / 36;
+			var AGENT_SIZE = SQUARE_SIZE * 1.56;
+			var AGENT_SPEED = SQUARE_SIZE * .003125;
+		</script>
 	</body>
 </html>

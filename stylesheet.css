@@ -4,14 +4,24 @@ html{
 
 body{
 	height: 100%;
+	margin: 0px;
+	overflow:hidden;
 }
 
-#canvas{
-	height: 576px;
-	width: 448px;
-	margin: 0 auto;
-	border: 2px solid black;
+#container{
+	width: 100%;
+	height: 100%;
+}
+
+.canvas{
 	background-image: url('images/pacmanBoard.png');
-	background-size: 448px 576px;
 	background-repeat: no-repeat;	
+}
+
+#canvas1{
+	float: left;
+}
+
+#canvas2{
+	float: right;
 }
