@@ -10,7 +10,7 @@ var FRIGHTENED = 3;
 var RESET = 4;
 
 var stopwatch1;
-var intersection = [118,133,225,230,233,236,239,242,245,250,314,329,404,407,482,485,494,497,569,578,650,653,662,665,734,737,740,743,746,749,815,836,908,911];
+var intersection = [118,133,225,230,233,236,239,242,245,250,314,329,482,485,494,497,569,578,650,653,662,665,734,737,746,749,815,836,908,911];
 
 var pacmanMap = 	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 					 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -207,7 +207,7 @@ function pacmanTrav(agent){
 	if(agent.turning){
 		center(agent, space);
 		agent.turning = false;
-		game1.score++;
+		agent.game.score++;
 	}
 }
 
@@ -229,7 +229,7 @@ function ghostTrav(){
 	var agent = this;
 	var currentSquare = pixelsToSquare(agent.game.origin, agent.location);
 	
-	eatenPacman(game1, currentSquare);
+	eatenPacman(agent.game, currentSquare);
 	sideTunnelAdjust(agent,currentSquare);
 	
 	var next = nextSquare(agent.direction, currentSquare);
@@ -278,7 +278,7 @@ function dirToTarget(agent, adjSquare){
 	for(var i = 0; i < 4; ++i){
 		if((i+1) != oppDir && adjSquare[i] >= 0){
 			var dist = distance(squareToPixels(agent.game.origin, agent.target), squareToPixels(agent.game.origin, adjSquare[i]));
-			if(dist < min || min == -1){
+			if(dist < min || min == -1 || (dist <= min && (i+1 == 1 || i+1 > dir))){
 				min = dist;
 				dir = i + 1;
 			}
@@ -328,16 +328,16 @@ function pinkyAlgo(agent){
 		var target;
 		switch(agent.direction){
 			case 1:
-				target = pixelsToSquare(agent.game.origin, agent.location) - (28 * 4) - 4;
+				target = pixelsToSquare(agent.game.origin, agent.game.pacman.location) - (28 * 4) - 4;
 				break;
 			case 2:
-				target = pixelsToSquare(agent.game.origin, agent.location) + 4;
+				target = pixelsToSquare(agent.game.origin, agent.game.pacman.location) + 4;
 				break;
 			case 3:
-				target = pixelsToSquare(agent.game.origin, agent.location) + (28 * 4);
+				target = pixelsToSquare(agent.game.origin, agent.game.pacman.location) + (28 * 4);
 				break;
 			case 4:
-				target = pixelsToSquare(agent.game.origin, agent.location) - 4;
+				target = pixelsToSquare(agent.game.origin, agent.game.pacman.location) - 4;
 				break;
 		}
 		return target;
@@ -512,7 +512,7 @@ function lifeLost(game){
 			
 			clear();
 			game.drawAgents();
-			game1.drawGameData();
+			game.drawGameData();
 		}, 1000);
 	}
 	else{
