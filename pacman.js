@@ -95,7 +95,7 @@ Game.prototype.drawAgents = function(){
 Game.prototype.drawGameData = function(){
 	for(var i=0; i < this.lives - 1; ++i){
 		fill('#FFFB14');
-		ellipse(height*.1 + AGENT_SIZE * 1.5 * i, height * .97222, AGENT_SIZE, AGENT_SIZE);
+		ellipse(height*.1 + AGENT_SIZE * 1.5 * i + this.origin.x, height * .97222 + this.origin.y, AGENT_SIZE, AGENT_SIZE);
 	}
 }
 
@@ -458,10 +458,14 @@ function isCentered(space, dir){
 function draw(){
 		keyCheck();
 		clear();
+		
 		game1.updateAgentsLocation();
 		game1.drawAgents();
 		game1.drawGameData();
 		
+		game2.updateAgentsLocation();
+		game2.drawAgents();
+		game2.drawGameData();
 }
 
 function setup(){
@@ -480,7 +484,10 @@ function setup(){
 	game2.changeMode(RESET);
 	
 	game1.drawAgents();
+	game2.drawAgents();
+
 	game1.drawGameData();
+	game2.drawGameData();
 	noLoop();
 }
 
@@ -511,8 +518,10 @@ function lifeLost(game){
 			game.clyde.nextDir = 1;
 			
 			clear();
-			game.drawAgents();
-			game.drawGameData();
+			game1.drawAgents();
+			game1.drawGameData();
+			game2.drawAgents();
+			game2.drawGameData();
 		}, 1000);
 	}
 	else{
