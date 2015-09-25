@@ -53,6 +53,7 @@ var div1 = document.getElementById('canvas1');
 var div2 = document.getElementById('canvas2');
 var container = document.getElementById('container');
 var game1;
+var game2;
 
 function Location(x,y)
 {
@@ -61,11 +62,11 @@ function Location(x,y)
 }
 
 function Game(origin){	
-	this.pacman = new Agent(this, squareToPixels(origin, PACMAN_START), 0, 4, '#FFFB14', 0, pacmanTrav, null, 0, 0, null);
-	this.blinky = new Agent(this, squareToPixels(origin, BLINKY_START), 0, 4, '#FF1212', SCATTER, ghostTrav, blinkyAlgo, 0, 26, null);
-	this.pinky = new Agent(this, squareToPixels(origin, PINKY_START), 0, 1, '#FFA8C7', SCATTER, ghostTrav, pinkyAlgo, 0, 2, null);
-	this.inky = new Agent(this, squareToPixels(origin, INKY_START), 0, 2, '#78FFFE', SCATTER, ghostTrav, inkyAlgo, 0, 979, 1);
-	this.clyde = new Agent(this, squareToPixels(origin, CLYDE_START), 0, 4, '#FFC17D', SCATTER, ghostTrav, clydeAlgo, 0, 952, 1);
+	this.pacman = new Agent(this, squareToPixels(origin, PACMAN_START), 0, 4, '#FFFB14', 0, pacmanTrav, null, 0, 0, null, null);
+	this.blinky = new Agent(this, squareToPixels(origin, BLINKY_START), 0, 4, '#FF1212', SCATTER, ghostTrav, blinkyAlgo, 0, 26, null, null);
+	this.pinky = new Agent(this, squareToPixels(origin, PINKY_START), 0, 1, '#FFA8C7', SCATTER, ghostTrav, pinkyAlgo, 0, 2, null, null);
+	this.inky = new Agent(this, squareToPixels(origin, INKY_START), 0, 2, '#78FFFE', SCATTER, ghostTrav, inkyAlgo, 0, 979, 1, null);
+	this.clyde = new Agent(this, squareToPixels(origin, CLYDE_START), 0, 4, '#FFC17D', SCATTER, ghostTrav, clydeAlgo, 0, 952, 1, null);
 	
 	this.origin = origin;
 	this.dots;
@@ -148,7 +149,7 @@ Game.prototype.reverseDirection = function(){
 }
 
 
-function Agent(game, location, velocity, direction, color, mode, traversal, algo, turning, target, nextDir){
+function Agent(game, location, velocity, direction, color, mode, traversal, algo, turning, target, nextDir, network){
 	this.game = game;
 	this.location = location;
 	this.velocity = velocity;
@@ -160,6 +161,7 @@ function Agent(game, location, velocity, direction, color, mode, traversal, algo
 	this.turning = turning;
 	this.target = target;
 	this.nextDir = nextDir;
+	this.network = network;
 }
 
 Agent.prototype.updateLocation = function(){
@@ -200,7 +202,7 @@ function Dot(location, size){
 }
 
 function pacmanTrav(agent){
-	var space = spacePosition(agent.location);
+	var space = spacePosition(agent.location, agent.game.origin);
 	if(validMove(agent, agent.direction) || !isCentered(space, agent.direction)){
 		agent.moveStep();
 	}
@@ -233,7 +235,7 @@ function ghostTrav(){
 	sideTunnelAdjust(agent,currentSquare);
 	
 	var next = nextSquare(agent.direction, currentSquare);
-	var space = spacePosition(agent.location);
+	var space = spacePosition(agent.location, agent.game.origin);
 
 	if(agent.nextDir != null){ //if instruction was sent to change direction
 		if(validMove(agent, agent.nextDir) && isCentered(space, agent.direction)){
@@ -264,7 +266,7 @@ function ghostTrav(){
 			for(var i = 1; i <= 4; ++i){
 				if(i != oppDir && pacmanMap[nextSquare(i, currentSquare)] == 1){
 					agent.direction = i;
-					center(agent, spacePosition(agent.location));
+					center(agent, spacePosition(agent.location, agent.game.origin));
 				}
 			}
 		}
@@ -456,7 +458,7 @@ function isCentered(space, dir){
 
 
 function draw(){
-		keyCheck();
+		keyCheck(game1);
 		clear();
 		
 		game1.updateAgentsLocation();
@@ -477,8 +479,8 @@ function setup(){
 	var origin1 = new Location(0,0);
 	var origin2 = new Location(width - div2.scrollWidth,0);
 	
-	game1 = new Game(origin1);
-	game2 = new Game(origin2);
+	game1 = new Game(origin1, null);
+	game2 = new Game(origin2, null);
 	
 	game1.changeMode(RESET);
 	game2.changeMode(RESET);
@@ -550,33 +552,33 @@ function newLife(game){
 	}, 1000);
 }
 
-function keyCheck(){
+function keyCheck(game){
 	if(keyIsDown(LEFT_ARROW)){
-		if(validMove(game1.pacman, 4))
+		if(validMove(game.pacman, 4) && game.pacman.direction != 4)
 		{
-			game1.pacman.direction = 4;
-			game1.pacman.turning = true;
+			game.pacman.direction = 4;
+			game.pacman.turning = true;
 		}
 	}
 	else if(keyIsDown(UP_ARROW)){
-		if(validMove(game1.pacman, 1))
+		if(validMove(game.pacman, 1) && game.pacman.direction != 1)
 		{
-			game1.pacman.direction = 1;
-			game1.pacman.turning = true;
+			game.pacman.direction = 1;
+			game.pacman.turning = true;
 		}
 	}
 	else if(keyIsDown(RIGHT_ARROW)){
-		if(validMove(game1.pacman, 2))
+		if(validMove(game.pacman, 2) && game.pacman.direction != 2)
 		{
-			game1.pacman.direction = 2;
-			game1.pacman.turning = true;
+			game.pacman.direction = 2;
+			game.pacman.turning = true;
 		}
 	}
 	else if(keyIsDown(DOWN_ARROW)){
-		if(validMove(game1.pacman, 3))
+		if(validMove(game.pacman, 3) && game.pacman.direction != 3)
 		{
-			game1.pacman.direction = 3;
-			game1.pacman.turning = true;
+			game.pacman.direction = 3;
+			game.pacman.turning = true;
 		}
 	}
 	
@@ -621,9 +623,9 @@ function pixelsToSquare(origin, location){
 		return (row * 28 + col);
 }
 
-function spacePosition(location){
-	var x = location.x % SQUARE_SIZE;
-	var y = location.y % SQUARE_SIZE;
+function spacePosition(location, origin){
+	var x = (location.x - origin.x) % SQUARE_SIZE;
+	var y = (location.y - origin.y) % SQUARE_SIZE;
 	var space = new Location(x,y);
 	return space;
 }
