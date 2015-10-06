@@ -207,7 +207,7 @@ Agent.prototype.makeDecision = function(){
 			dir = i+1;
 		}
 	}
-	this.direction = 4;
+	this.direction = 3;
 };
 
 function Dot(location, size){
@@ -566,24 +566,24 @@ function newLife(game){
 		console.log(game2.timer);
 		
 		if(game1.timer == 7 || game1.timer == 34 || game1.timer == 59 || game1.timer == 84){
-			game.changeMode(CHASE);
-			game.reverseDirection();
+			game1.changeMode(CHASE);
+			game1.reverseDirection();
 			console.log("CHASE 1");
 		}
 		else if(game1.timer == 27 || game1.timer == 54 || game1.timer == 79){
-			game.changeMode(SCATTER);
-			game.reverseDirection();
+			game1.changeMode(SCATTER);
+			game1.reverseDirection();
 			console.log("SCATTER 1 ");
 		}
 		
 		if(game2.timer == 7 || game2.timer == 34 || game2.timer == 59 || game2.timer == 84){
-			game.changeMode(CHASE);
-			game.reverseDirection();
+			game2.changeMode(CHASE);
+			game2.reverseDirection();
 			console.log("CHASE 2");
 		}
 		else if(game2.timer == 27 || game2.timer == 54 || game2.timer == 79){
-			game.changeMode(SCATTER);
-			game.reverseDirection();
+			game2.changeMode(SCATTER);
+			game2.reverseDirection();
 			console.log("SCATTER 2");
 		}
 	}, 1000);
