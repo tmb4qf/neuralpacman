@@ -19,6 +19,7 @@ function Network(){
 }
 
 Network.prototype.feedForward = function(){
+	this.setInput(game2);
 	var out = this.net.forward(this.input);
 	
 	for(var i=0; i < this.outputNum; i++){
@@ -40,35 +41,34 @@ Network.prototype.setInput = function(game){
 	this.input.w[3] = (game.blinky.location.x - game.origin.x) / scaleX;
 	this.input.w[4] = (game.blinky.location.y - game.origin.y) / scaleY;
 	this.input.w[5] = game.blinky.direction / scaleDir;
-	var blinkyTar = squareToPixels(game.blinky.target)
+	var blinkyTar = squareToPixels(game.origin, game.blinky.target)
 	this.input.w[6] = (blinkyTar.x - game.origin.x) / scaleX;
-	this.input.w[7] = (blinkyTar.y - game.origin.y) / scaley;
+	this.input.w[7] = (blinkyTar.y - game.origin.y) / scaleY;
 	
 	this.input.w[8] = (game.pinky.location.x - game.origin.x) / scaleX;
 	this.input.w[9] = (game.pinky.location.y - game.origin.y) / scaleY;
 	this.input.w[10] = game.pinky.direction / scaleDir;
-	var pinkyTar = squareToPixels(game.pinky.target)
+	var pinkyTar = squareToPixels(game.origin, game.pinky.target)
 	this.input.w[11] = (pinkyTar.x - game.origin.x) / scaleX;
-	this.input.w[12] = (pinkyTar.y - game.origin.y) / scaley;
+	this.input.w[12] = (pinkyTar.y - game.origin.y) / scaleY;
 	
 	this.input.w[13] = (game.inky.location.x - game.origin.x) / scaleX;
 	this.input.w[14] = (game.inky.location.y - game.origin.y) / scaleY;
 	this.input.w[15] = game.inky.direction / scaleDir;
-	var inkyTar = squareToPixels(game.inky.target)
+	var inkyTar = squareToPixels(game.origin, game.inky.target)
 	this.input.w[16] = (inkyTar.x - game.origin.x) / scaleX;
-	this.input.w[17] = (inkyTar.y - game.origin.y) / scaley;
+	this.input.w[17] = (inkyTar.y - game.origin.y) / scaleY;
 	
 	this.input.w[18] = (game.clyde.location.x - game.origin.x) / scaleX;
 	this.input.w[19] = (game.clyde.location.y - game.origin.y) / scaleY;
 	this.input.w[20] = game.clyde.direction / scaleDir;
-	var clydeTar = squareToPixels(game.clyde.target)
+	var clydeTar = squareToPixels(game.origin, game.clyde.target)
 	this.input.w[21] = (clydeTar.x - game.origin.x) / scaleX;
-	this.input.w[22] = (clydeTar.y - game.origin.y) / scaley;
+	this.input.w[22] = (clydeTar.y - game.origin.y) / scaleY;
 	
 	for(var i=0; i < this.outputNum; i++){
-		this.input.w[23 + i] = this.prevOutput[i];
+		this.input.w[23 + i] = this.prevOutput.w[i];
 	}
-	console.log(this.input);
 }
 
 Network.prototype.updateChromosome = function(){

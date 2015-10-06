@@ -199,6 +199,7 @@ Agent.prototype.draw = function(){
 
 Agent.prototype.makeDecision = function(){
 	var out = this.network.output;
+	
 	var max = out.w[0];
 	var dir = 1;
 	for(var i=1; i <= 3; i++){
@@ -207,7 +208,12 @@ Agent.prototype.makeDecision = function(){
 			dir = i+1;
 		}
 	}
-	this.direction = 3;
+	
+	if(validMove(this, dir)){
+		turnCheck(dir, this);
+		this.direction = dir;
+		console.log("Trying to go: " + dir);
+	}
 };
 
 function Dot(location, size){
@@ -587,6 +593,25 @@ function newLife(game){
 			console.log("SCATTER 2");
 		}
 	}, 1000);
+}
+
+function turnCheck(dir, agent){
+	if(dir == 1 && agent.direction != 1)
+	{
+		agent.turning = true;
+	}
+	if(dir == 2 && agent.direction != 2)
+	{
+		agent.turning = true;
+	}
+	if(dir == 3 && agent.direction != 3)
+	{
+		agent.turning = true;
+	}
+	if(dir == 4 && agent.direction != 4)
+	{
+		agent.turning = true;
+	}
 }
 
 function keyCheck(game){
