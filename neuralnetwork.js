@@ -1,12 +1,12 @@
-var trainingMode = true;
+var trainingMode = false;
 
 function Network(){
 	this.inputNum = 31;
 	this.outputNum = 8;
 	
 	this.input = new convnetjs.Vol(1,1,this.inputNum,0);
-	this.output = convnetjs.zeros(this.outputNum);
-	this.prevOutput = convnetjs.zeros(this.outputNum);
+	this.output = new convnetjs.Vol(1,1,this.outputNum,0);
+	this.prevOutput = new convnetjs.Vol(1,1,this.outputNum,0);
 	
 	this.layers = [];
 	this.layers.push({type: 'input', out_sx: 1, out_sy: 1, out_depth: this.inputNum});
@@ -14,18 +14,18 @@ function Network(){
 	
 	this.net = new convnetjs.Net();
 	this.net.makeLayers(this.layers);
-	console.log(this.net.layers[1].filters);
 	this.chromosome = new Chromosome();
 	this.assignChromosome(this.chromosome);
 }
 
-Network.prototype.forward = function(){
+Network.prototype.feedForward = function(){
 	var out = this.net.forward(this.input);
 	
 	for(var i=0; i < this.outputNum; i++){
-		this.prevOutput[i] = this.output[i];
-		this.output[i] = out.w[i];
+		this.prevOutput.w[i] = this.output.w[i];
+		this.output.w[i] = out.w[i];
 	}
+	//console.log(this.output);
 }
 
 Network.prototype.setInput = function(game){
@@ -68,6 +68,7 @@ Network.prototype.setInput = function(game){
 	for(var i=0; i < this.outputNum; i++){
 		this.input.w[23 + i] = this.prevOutput[i];
 	}
+	console.log(this.input);
 }
 
 Network.prototype.updateChromosome = function(){

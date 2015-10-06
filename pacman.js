@@ -61,7 +61,8 @@ function Location(x,y)
 	this.y = y;
 }
 
-function Game(origin, network){
+function Game(origin, network, id){
+	this.id = id;
 	this.pacman = new Agent(this, squareToPixels(origin, PACMAN_START), 0, 4, '#FFFB14', 0, pacmanTrav, null, 0, 0, null, network);
 	this.blinky = new Agent(this, squareToPixels(origin, BLINKY_START), 0, 4, '#FF1212', SCATTER, ghostTrav, blinkyAlgo, 0, 26, null, null);
 	this.pinky = new Agent(this, squareToPixels(origin, PINKY_START), 0, 1, '#FFA8C7', SCATTER, ghostTrav, pinkyAlgo, 0, 2, null, null);
@@ -196,6 +197,19 @@ Agent.prototype.draw = function(){
 	ellipse(this.location.x, this.location.y, AGENT_SIZE, AGENT_SIZE);
 };
 
+Agent.prototype.makeDecision = function(){
+	var out = this.network.output;
+	var max = out.w[0];
+	var dir = 1;
+	for(var i=1; i <= 3; i++){
+		if(out.w[i] > max){
+			max = out.w[i];
+			dir = i+1;
+		}
+	}
+	this.direction = 4;
+};
+
 function Dot(location, size){
 	this.location = location;
 	this.size = size;
@@ -209,7 +223,6 @@ function pacmanTrav(agent){
 	if(agent.turning){
 		center(agent, space);
 		agent.turning = false;
-		agent.game.score++;
 	}
 }
 
@@ -466,6 +479,8 @@ function draw(){
 		game1.drawAgents();
 		game1.drawGameData();
 		
+		game2.pacman.network.feedForward();
+		game2.pacman.makeDecision();
 		game2.updateAgentsLocation();
 		game2.drawAgents();
 		game2.drawGameData();
@@ -481,8 +496,8 @@ function setup(){
 	var origin1 = new Location(0,0);
 	var origin2 = new Location(width - div2.scrollWidth,0);
 	
-	game1 = new Game(origin1, null);
-	game2 = new Game(origin2, new Network());
+	game1 = new Game(origin1, null, 1);
+	game2 = new Game(origin2, new Network(), 2);
 	
 	game1.changeMode(RESET);
 	game2.changeMode(RESET);
@@ -498,58 +513,78 @@ function setup(){
 function lifeLost(game){
 	noLoop();
 	clearInterval(stopwatch1);
-	game.timer = 0;
+	
+	if(game.id == 1)
+		game1.timer = 0;
+	else
+		game2.timer = 0;
+	
 	game.changeMode(RESET);
 	game.lives--;
 	
 	if(game.lives > 0){
-		setTimeout(function(){
-			game.pacman.location = squareToPixels(game.origin, PACMAN_START);
-			game.pacman.direction = 4;
-			
-			game.blinky.location = squareToPixels(game.origin, BLINKY_START);
-			game.blinky.direction = 4;
-			
-			game.pinky.location = squareToPixels(game.origin, PINKY_START);
-			game.pinky.direction = 1;
-			
-			game.inky.location = squareToPixels(game.origin, INKY_START);
-			game.inky.direction = 2;
-			game.inky.nextDir = 1;
-			
-			game.clyde.location = squareToPixels(game.origin, CLYDE_START);
-			game.clyde.direction = 4;
-			game.clyde.nextDir = 1;
-			
-			clear();
-			game1.drawAgents();
-			game1.drawGameData();
-			game2.drawAgents();
-			game2.drawGameData();
-		}, 1000);
+			setTimeout(function(){
+				game.pacman.location = squareToPixels(game.origin, PACMAN_START);
+				game.pacman.direction = 4;
+				
+				game.blinky.location = squareToPixels(game.origin, BLINKY_START);
+				game.blinky.direction = 4;
+				
+				game.pinky.location = squareToPixels(game.origin, PINKY_START);
+				game.pinky.direction = 1;
+				
+				game.inky.location = squareToPixels(game.origin, INKY_START);
+				game.inky.direction = 2;
+				game.inky.nextDir = 1;
+				
+				game.clyde.location = squareToPixels(game.origin, CLYDE_START);
+				game.clyde.direction = 4;
+				game.clyde.nextDir = 1;
+				
+				clear();
+				game1.drawAgents();
+				game1.drawGameData();
+				game2.drawAgents();
+				game2.drawGameData();
+			}, 1000);
 	}
 	else{
 		console.log("dead");
-		clear();
+		setTimeout(function(){
+			clear();
+		}, 1000);
 	}
 }
 
 function newLife(game){
-	loop();
 	game.changeMode(SCATTER);
-	console.log("SCATTER");
+	console.log("SCATTER " + game.id);
 	stopwatch1 = setInterval(function(){
-		game.timer++;
-		console.log(game.timer);
-		if(game.timer == 7 || game.timer == 34 || game.timer == 59 || game.timer == 84){
+		game1.timer++;
+		game2.timer++
+		console.log(game1.timer);
+		console.log(game2.timer);
+		
+		if(game1.timer == 7 || game1.timer == 34 || game1.timer == 59 || game1.timer == 84){
 			game.changeMode(CHASE);
 			game.reverseDirection();
-			console.log("CHASE");
+			console.log("CHASE 1");
 		}
-		else if(game.timer == 27 || game.timer == 54 || game.timer == 79){
+		else if(game1.timer == 27 || game1.timer == 54 || game1.timer == 79){
 			game.changeMode(SCATTER);
 			game.reverseDirection();
-			console.log("SCATTER");
+			console.log("SCATTER 1 ");
+		}
+		
+		if(game2.timer == 7 || game2.timer == 34 || game2.timer == 59 || game2.timer == 84){
+			game.changeMode(CHASE);
+			game.reverseDirection();
+			console.log("CHASE 2");
+		}
+		else if(game2.timer == 27 || game2.timer == 54 || game2.timer == 79){
+			game.changeMode(SCATTER);
+			game.reverseDirection();
+			console.log("SCATTER 2");
 		}
 	}, 1000);
 }
@@ -656,7 +691,17 @@ function oppositeDir(dir){
 
 document.addEventListener("keypress", function(e){
 	if(e.keyCode == 13 && game1.mode == RESET){
+		if(game2.mode == RESET){
+			game2.changeMode(SCATTER);
+		}
+	
+		loop();
 		newLife(game1);
+		console.log("newLife")
+	}
+	else if(e.keyCode == 13 && game2.mode == RESET){
+		loop();
+		newLife(game2);
 		console.log("newLife")
 	}
 });
