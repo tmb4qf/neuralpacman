@@ -715,18 +715,24 @@ function oppositeDir(dir){
 }
 
 document.addEventListener("keypress", function(e){
-	if(e.keyCode == 13 && game1.mode == RESET){
-		if(game2.mode == RESET){
-			game2.changeMode(SCATTER);
+	if(!trainingMode){
+		if(e.keyCode == 13 && game1.mode == RESET){
+			if(game2.mode == RESET){
+				game2.changeMode(SCATTER);
+			}
+		
+			loop();
+			newLife(game1);
+			console.log("newLife")
 		}
-	
-		loop();
-		newLife(game1);
-		console.log("newLife")
+		else if(e.keyCode == 13 && game2.mode == RESET){
+			loop();
+			newLife(game2);
+			console.log("newLife")
+		}
 	}
-	else if(e.keyCode == 13 && game2.mode == RESET){
-		loop();
-		newLife(game2);
-		console.log("newLife")
+	else{
+		console.log("Starting Sim");
+		simulateGame(new Chromosome());
 	}
 });

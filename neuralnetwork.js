@@ -1,4 +1,4 @@
-var trainingMode = false;
+var trainingMode = true;
 
 function Network(){
 	this.inputNum = 31;
@@ -26,7 +26,6 @@ Network.prototype.feedForward = function(){
 		this.prevOutput.w[i] = this.output.w[i];
 		this.output.w[i] = out.w[i];
 	}
-	//console.log(this.output);
 }
 
 Network.prototype.setInput = function(game){
@@ -71,7 +70,7 @@ Network.prototype.setInput = function(game){
 	}
 }
 
-Network.prototype.updateChromosome = function(){
+Network.prototype.getChromosome = function(){	//get weights/chromosom out of neural network and store it in this.chromosome
 	var chromIndex = 0;
 	
 	for(var i=0; i < this.outputNum; i++){
@@ -83,7 +82,7 @@ Network.prototype.updateChromosome = function(){
 	}
 }
 
-Network.prototype.assignChromosome = function(chromosome){
+Network.prototype.assignChromosome = function(chromosome){	//pass in chromosome to be inserted into neural network
 	var chromIndex = 0;
 	
 	for(var i=0; i < this.outputNum; i++){
@@ -105,4 +104,35 @@ function Chromosome(){
 	for(var i=0; i<248; i++){
 		this.genes.push(2 * Math.random() - 1);
 	}
+}
+
+function simulateGame(chromosome){
+	var theNetwork = new Network();
+	theNetwork.assignChromosome(chromosome);
+	
+	var ticks = 0;
+	game2.changeMode(SCATTER);
+	
+	while(game2.lives == 3 || ticks > 3000){
+		game2.pacman.network.feedForward();
+		game2.pacman.makeDecision();
+		game2.updateAgentsLocation();
+		clear();
+		game2.drawAgents();
+		
+		if(game2.ticks == 210 || game2.ticks == 1020 || game2.ticks == 1770 || game2.ticks == 2520){
+			game2.changeMode(CHASE);
+			game2.reverseDirection();
+			console.log("CHASE 2");
+		}
+		else if(game2.ticks == 810 || game2.ticks == 1620 || game2.ticks == 2370){
+			game1.changeMode(SCATTER);
+			game1.reverseDirection();
+			console.log("SCATTER 2");
+		}
+		
+		ticks++;
+	}
+	console.log("Ticks: " + ticks);
+	console.log("Lives: " + game2.lives);
 }
