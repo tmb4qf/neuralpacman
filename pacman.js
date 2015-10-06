@@ -61,8 +61,8 @@ function Location(x,y)
 	this.y = y;
 }
 
-function Game(origin){	
-	this.pacman = new Agent(this, squareToPixels(origin, PACMAN_START), 0, 4, '#FFFB14', 0, pacmanTrav, null, 0, 0, null, null);
+function Game(origin, network){
+	this.pacman = new Agent(this, squareToPixels(origin, PACMAN_START), 0, 4, '#FFFB14', 0, pacmanTrav, null, 0, 0, null, network);
 	this.blinky = new Agent(this, squareToPixels(origin, BLINKY_START), 0, 4, '#FF1212', SCATTER, ghostTrav, blinkyAlgo, 0, 26, null, null);
 	this.pinky = new Agent(this, squareToPixels(origin, PINKY_START), 0, 1, '#FFA8C7', SCATTER, ghostTrav, pinkyAlgo, 0, 2, null, null);
 	this.inky = new Agent(this, squareToPixels(origin, INKY_START), 0, 2, '#78FFFE', SCATTER, ghostTrav, inkyAlgo, 0, 979, 1, null);
@@ -139,14 +139,14 @@ Game.prototype.changeMode = function(mode){
 		this.inky.velocity = 0;
 		this.clyde.velocity = 0;
 	}
-}
+};
 
 Game.prototype.reverseDirection = function(){
 	this.blinky.direction = oppositeDir(this.blinky.direction);
 	this.pinky.direction = oppositeDir(this.pinky.direction);
 	this.inky.direction = oppositeDir(this.inky.direction);
 	this.clyde.direction = oppositeDir(this.clyde.direction);
-}
+};
 
 
 function Agent(game, location, velocity, direction, color, mode, traversal, algo, turning, target, nextDir, network){
@@ -189,7 +189,7 @@ Agent.prototype.moveStep = function(){
 			this.location.x -= this.velocity * AGENT_SPEED;
 			break;
 	}	
-}
+};
 
 Agent.prototype.draw = function(){
 	fill(this.color);
@@ -458,6 +458,7 @@ function isCentered(space, dir){
 
 
 function draw(){
+	if(!trainingMode){
 		keyCheck(game1);
 		clear();
 		
@@ -468,6 +469,7 @@ function draw(){
 		game2.updateAgentsLocation();
 		game2.drawAgents();
 		game2.drawGameData();
+	}
 }
 
 function setup(){
@@ -480,7 +482,7 @@ function setup(){
 	var origin2 = new Location(width - div2.scrollWidth,0);
 	
 	game1 = new Game(origin1, null);
-	game2 = new Game(origin2, null);
+	game2 = new Game(origin2, new Network());
 	
 	game1.changeMode(RESET);
 	game2.changeMode(RESET);
