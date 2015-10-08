@@ -98,41 +98,114 @@ Network.prototype.assignChromosome = function(chromosome){	//pass in chromosome 
 
 function Chromosome(){
 	this.genes = [];
-	this.fitness;
-	this.gamesPlayed;
+	this.fitness = -1;
+	this.gamesPlayed = 0;
 	
 	for(var i=0; i<248; i++){
 		this.genes.push(2 * Math.random() - 1);
 	}
 }
 
+Chromosome.prototype.crossover = function(chrom1){
+	var len = this.genes.length;
+	var newChrom = new Chromosome();
+	newChrom.genes = this.genes;
+	
+	for(var i=len/2; i < 248; i++){
+		newChrom.genes[i] = chrom1.genes[i];
+	}
+	
+	return newChrom;
+};
+
+Chromosome.prototype.mutate = function(rate){
+	var len = this.genes.length * rate;
+	
+	for(var i=0; i < len; i++){
+		var randGene = Math.floor(Math.random() * 248);
+		var newGene = 2 * Math.random() - 1;
+		
+		this.genes[randGene] = newGene;
+	}
+};
+
+
 function simulateGame(chromosome){
+	var game = new Game(new Location(0,0), new Network(),3);
 	var theNetwork = new Network();
 	theNetwork.assignChromosome(chromosome);
 	
 	var ticks = 0;
-	game2.changeMode(SCATTER);
+	game.changeMode(SCATTER);
 	
-	while(game2.lives == 3 || ticks > 3000){
-		game2.pacman.network.feedForward();
-		game2.pacman.makeDecision();
-		game2.updateAgentsLocation();
-		clear();
-		game2.drawAgents();
+	while(game.lives == 3 && ticks < 3000){
+		game.pacman.network.feedForward();
+		game.pacman.makeDecision();
+		game.updateAgentsLocation();
 		
-		if(game2.ticks == 210 || game2.ticks == 1020 || game2.ticks == 1770 || game2.ticks == 2520){
-			game2.changeMode(CHASE);
-			game2.reverseDirection();
-			console.log("CHASE 2");
+		if(ticks == 210 || ticks == 1020 || ticks == 1770 || ticks == 2520){
+			game.changeMode(CHASE);
+			game.reverseDirection();
 		}
-		else if(game2.ticks == 810 || game2.ticks == 1620 || game2.ticks == 2370){
-			game1.changeMode(SCATTER);
-			game1.reverseDirection();
-			console.log("SCATTER 2");
+		else if(ticks == 810 || ticks == 1620 || ticks == 2370){
+			game.changeMode(SCATTER);
+			game.reverseDirection();
 		}
 		
 		ticks++;
 	}
-	console.log("Ticks: " + ticks);
-	console.log("Lives: " + game2.lives);
+	//console.log("Ticks: " + ticks);
+	return ticks;
 }
+
+function generation(size, chromosomes, gen){
+	var rate = .05;
+	
+	//var totalAll = 0;
+	for(var j=0; j < size; j++){
+		var fitness = simulateGame(chromosomes[j]);
+		chromosomes[j].fitness += fitness;
+		//totalAll += fitness;
+		chromosomes[j].gamesPlayed++;
+	}
+	
+	chromosomes.sort(function(a,b){return (b.fitness/b.gamesPlayed) - (a.fitness/a.gamesPlayed)});
+	chromosomes.splice(20, 80);
+	
+	var total = 0;
+	for(var l=0; l < 20; l++){
+		total += chromosomes[l].fitness / chromosomes[l].gamesPlayed;
+	}
+	
+	console.log(gen + ": " + total/20);
+	//console.log(totalAll/100);
+	
+	//crossover
+	for(var k=0; k<80; k++){
+		var rand1 = Math.floor(Math.random() * 20);
+		var rand2 = Math.floor(Math.random() * 20);
+		
+		var newChrom = chromosomes[rand1].crossover(chromosomes[rand2]);
+		chromosomes.push(newChrom);
+	}
+	
+	//Mutate
+	for(var m=0; m < size; m++){
+		chromosomes[m].mutate(rate);
+	}
+	
+}
+
+function train(generationCount, size){
+	var chromosomes = [];
+	
+	for(var i=0; i < size; i++){
+		chromosomes[i] = new Chromosome();
+	}	
+	
+	for(var j=0; j < generationCount; j++){
+		generation(size, chromosomes, j+1);
+	}
+}
+
+

@@ -198,7 +198,7 @@ Agent.prototype.draw = function(){
 };
 
 Agent.prototype.makeDecision = function(){
-	var out = this.network.output;
+	/*var out = this.network.output;
 	
 	var max = out.w[0];
 	var dir = 1;
@@ -212,9 +212,30 @@ Agent.prototype.makeDecision = function(){
 	if(validMove(this, dir)){
 		turnCheck(dir, this);
 		this.direction = dir;
-		console.log("Trying to go: " + dir);
+		//console.log("Trying to go: " + dir);
+	}*/
+	
+	var out = [];
+	for(var i=0; i < 4; i++){
+		out[i] = new dirNum(i+1, this.network.output.w[i]);
+	}
+	
+	out.sort(function(a,b){return b.num - a.num});
+	
+	for(var j=0; j < 4; j++){
+		if(validMove(this, out[j].dir)){
+			turnCheck(out[j].dir,this);
+			this.direction = out[j].dir;
+			break;
+		}
 	}
 };
+
+function dirNum(dir, num){
+	this.dir = dir;
+	this.num = num;
+}
+
 
 function Dot(location, size){
 	this.location = location;
@@ -528,7 +549,7 @@ function lifeLost(game){
 	game.changeMode(RESET);
 	game.lives--;
 	
-	if(game.lives > 0){
+	if(game.lives > 0 && !trainingMode){
 			setTimeout(function(){
 				game.pacman.location = squareToPixels(game.origin, PACMAN_START);
 				game.pacman.direction = 4;
@@ -554,7 +575,7 @@ function lifeLost(game){
 				game2.drawGameData();
 			}, 1000);
 	}
-	else{
+	else if(!trainingMode){
 		console.log("dead");
 		setTimeout(function(){
 			clear();
@@ -732,7 +753,7 @@ document.addEventListener("keypress", function(e){
 		}
 	}
 	else{
-		console.log("Starting Sim");
-		simulateGame(new Chromosome());
+		console.log("Starting Generation");
+		train(500, 100);
 	}
 });
