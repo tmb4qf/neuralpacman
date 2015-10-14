@@ -18,8 +18,8 @@ function Network(){
 	this.assignChromosome(this.chromosome);
 }
 
-Network.prototype.feedForward = function(){
-	this.setInput(game2);
+Network.prototype.feedForward = function(game){
+	this.setInput(game);
 	var out = this.net.forward(this.input);
 	
 	for(var i=0; i < this.outputNum; i++){
@@ -66,7 +66,7 @@ Network.prototype.setInput = function(game){
 	this.input.w[22] = (clydeTar.y - game.origin.y) / scaleY;
 	
 	for(var i=0; i < this.outputNum; i++){
-		this.input.w[23 + i] = this.prevOutput.w[i];
+		this.input.w[23 + i] = this.output.w[i];
 	}
 }
 
@@ -139,9 +139,11 @@ function simulateGame(chromosome){
 	game.changeMode(SCATTER);
 	
 	while(game.lives == 3 && ticks < 3000){
-		game.pacman.network.feedForward();
+		game.pacman.network.feedForward(game);
 		game.pacman.makeDecision();
 		game.updateAgentsLocation();
+		clear();
+		game.drawAgents();
 		
 		if(ticks == 210 || ticks == 1020 || ticks == 1770 || ticks == 2520){
 			game.changeMode(CHASE);
@@ -207,5 +209,3 @@ function train(generationCount, size){
 		generation(size, chromosomes, j+1);
 	}
 }
-
-
