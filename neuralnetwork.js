@@ -1,9 +1,9 @@
 var trainingMode = true;
-var chromLen = 408;
+var chromLen = 476;
 var avg = 0;
 
 function Network(chromosome){
-	this.inputNum = 26;
+	this.inputNum = 30;
 	this.outputNum = 8;
 	
 	this.input = new convnetjs.Vol(1,1,this.inputNum,0);
@@ -22,7 +22,7 @@ function Network(chromosome){
 	else
 		this.chromosome = new Chromosome();
 	
-	this.assignChromosome(this.chromosome);
+	this.assignChromosome(this.net, this.chromosome);
 }
 
 Network.prototype.feedForward = function(game){
@@ -35,41 +35,49 @@ Network.prototype.feedForward = function(game){
 }
 
 Network.prototype.setInput = function(game){
-	var scaleX = SQUARE_SIZE * 28;
-	var scaleY = SQUARE_SIZE * 36;
+	var scaleX = SQUARE_SIZE * 28 * .5;
+	var scaleY = SQUARE_SIZE * 36 * .5;
 	
-	this.input.w[0] = (game.pacman.location.x - game.origin.x) / scaleX;
-	this.input.w[1] = (game.pacman.location.y - game.origin.y) / scaleY;
+	this.input.w[0] = (game.pacman.location.x - game.origin.x) / scaleX - 1;
+	this.input.w[1] = (game.pacman.location.y - game.origin.y) / scaleY - 1;
 	
-	this.input.w[2] = (game.blinky.location.x - game.origin.x) / scaleX;
-	this.input.w[3] = (game.blinky.location.y - game.origin.y) / scaleY;
+	this.input.w[2] = (game.blinky.location.x - game.origin.x) / scaleX - 1;
+	this.input.w[3] = (game.blinky.location.y - game.origin.y) / scaleY - 1;
 	var blinkyTar = squareToPixels(game.origin, game.blinky.target)
-	this.input.w[4] = (blinkyTar.x - game.origin.x) / scaleX;
-	this.input.w[5] = (blinkyTar.y - game.origin.y) / scaleY;
+	this.input.w[4] = (blinkyTar.x - game.origin.x) / scaleX - 1;
+	this.input.w[5] = (blinkyTar.y - game.origin.y) / scaleY - 1;
 	
-	this.input.w[6] = (game.pinky.location.x - game.origin.x) / scaleX;
-	this.input.w[7] = (game.pinky.location.y - game.origin.y) / scaleY;
+	this.input.w[6] = (game.pinky.location.x - game.origin.x) / scaleX - 1;
+	this.input.w[7] = (game.pinky.location.y - game.origin.y) / scaleY - 1;
 	var pinkyTar = squareToPixels(game.origin, game.pinky.target)
-	this.input.w[8] = (pinkyTar.x - game.origin.x) / scaleX;
-	this.input.w[9] = (pinkyTar.y - game.origin.y) / scaleY;
+	this.input.w[8] = (pinkyTar.x - game.origin.x) / scaleX - 1;
+	this.input.w[9] = (pinkyTar.y - game.origin.y) / scaleY - 1;
 	
-	this.input.w[10] = (game.inky.location.x - game.origin.x) / scaleX;
-	this.input.w[11] = (game.inky.location.y - game.origin.y) / scaleY;
+	this.input.w[10] = (game.inky.location.x - game.origin.x) / scaleX - 1;
+	this.input.w[11] = (game.inky.location.y - game.origin.y) / scaleY - 1;
 	var inkyTar = squareToPixels(game.origin, game.inky.target)
-	this.input.w[12] = (inkyTar.x - game.origin.x) / scaleX;
-	this.input.w[13] = (inkyTar.y - game.origin.y) / scaleY;
+	this.input.w[12] = (inkyTar.x - game.origin.x) / scaleX - 1;
+	this.input.w[13] = (inkyTar.y - game.origin.y) / scaleY - 1;
 	
-	this.input.w[14] = (game.clyde.location.x - game.origin.x) / scaleX;
-	this.input.w[15] = (game.clyde.location.y - game.origin.y) / scaleY;
+	this.input.w[14] = (game.clyde.location.x - game.origin.x) / scaleX - 1;
+	this.input.w[15] = (game.clyde.location.y - game.origin.y) / scaleY - 1;
 	var clydeTar = squareToPixels(game.origin, game.clyde.target)
-	this.input.w[16] = (clydeTar.x - game.origin.x) / scaleX;
-	this.input.w[17] = (clydeTar.y - game.origin.y) / scaleY;
+	this.input.w[16] = (clydeTar.x - game.origin.x) / scaleX - 1;
+	this.input.w[17] = (clydeTar.y - game.origin.y) / scaleY - 1;
+	
+	var pacmanSquare = pixelsToSquare(game.origin, game.pacman.location);
+	
+	this.input.w[18] = pacmanMap[pacmanSquare - 28];
+	this.input.w[19] = pacmanMap[pacmanSquare + 1];
+	this.input.w[20] = pacmanMap[pacmanSquare + 28];
+	this.input.w[21] = pacmanMap[pacmanSquare - 1];
 	
 	for(var i=0; i < this.outputNum; i++){
-		this.input.w[18 + i] = this.output.w[i];
+		this.input.w[22 + i] = this.output.w[i];
 	}
 }
 
+/*
 Network.prototype.getChromosome = function(){	//get weights/chromosom out of neural network and store it in this.chromosome
 	var chromIndex = 0;
 	
@@ -80,20 +88,31 @@ Network.prototype.getChromosome = function(){	//get weights/chromosom out of neu
 			chromIndex++;
 		}
 	}
-}
+}*/
 
-Network.prototype.assignChromosome = function(chromosome){	//pass in chromosome to be inserted into neural network
+Network.prototype.assignChromosome = function(net,chromosome){	//pass in chromosome to be inserted into neural network
 	var chromIndex = 0;
 	
-	for(var i=0; i < this.outputNum; i++){
-		var x = new convnetjs.Vol(1,1,this.inputNum);
-		
-		for(var j=0; j < this.inputNum; j++){
-			x.w[j] = chromosome.genes[chromIndex];
+    for (var i = 0; i < net.layers.length; i++){
+      if (net.layers[i].filter){
+		var len = net.layers[i].filter.length;
+        for (var j = 0; j < len; j++){
+          var w = filter[j].w;
+          for (var k = 0; k < w.length; k++) {
+            w[k] = chromosome[chromIndex];
 			chromIndex++;
-		}
-		this.net.layers[1].filters[i] = x;
-	}
+          }
+        }
+      }
+	  
+      if (net.layers[i].biases){
+        var b = net.layers[i].biases.w;
+        for (var k = 0; k < b.length; k++){
+          b[k] = chromosome[chromIndex];
+			chromIndex++;
+        }  
+      }
+    }
 }
 
 var theNetwork = new Network(null);
@@ -133,7 +152,7 @@ Chromosome.prototype.mutate = function(rate){
 
 function simulateGame(chromosome){
 	var game = new Game(new Location(0,0), theNetwork, 3);
-	game.pacman.network.assignChromosome(chromosome);
+	game.pacman.network.assignChromosome(theNetwork.net, chromosome);
 	
 	var ticks = 0;
 	game.changeMode(SCATTER);
@@ -206,9 +225,34 @@ function train(generationCount, size){
 	for(var i=0; i < size; i++){
 		chromosomes[i] = new Chromosome();
 	}	
-	
+	getNetworkSize(theNetwork.net);
 	for(var j=0; j < generationCount; j++){
 		generation(size, chromosomes, j+1);
 	}
 	console.log(avg / generationCount);
 }
+
+function getNetworkSize(net) {
+    var layer = null;
+    var filter = null;
+    var bias = null;
+    var w = null;
+    var count = 0;
+    var i, j, k;
+    for ( i = 0; i < net.layers.length; i++) {
+      layer = net.layers[i];
+      filter = layer.filters;
+      if (filter) {
+        for ( j = 0; j < filter.length; j++) {
+          w = filter[j].w;
+          count += w.length;
+        }
+      }
+      bias = layer.biases;
+      if (bias) {
+        w = bias.w;
+        count += w.length;
+      }
+    }
+    console.log(count);
+  }

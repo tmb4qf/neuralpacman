@@ -533,8 +533,9 @@ function setup(){
 	var origin2 = new Location(width - div2.scrollWidth,0);
 	
 	game1 = new Game(origin1, null, 1);
+	
 	var chrom = new Chromosome();
-	//console.log(chrom);
+	console.log(chrom);
 	game2 = new Game(origin2, new Network(chrom), 2);
 	
 	game1.changeMode(RESET);
