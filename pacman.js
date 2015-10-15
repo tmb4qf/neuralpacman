@@ -197,9 +197,9 @@ Agent.prototype.draw = function(){
 	ellipse(this.location.x, this.location.y, AGENT_SIZE, AGENT_SIZE);
 };
 
+//Highest Move regardless
 Agent.prototype.makeDecision = function(){
-	/*var out = this.network.output;
-	
+	var out = this.network.output;
 	var max = out.w[0];
 	var dir = 1;
 	for(var i=1; i <= 3; i++){
@@ -212,8 +212,12 @@ Agent.prototype.makeDecision = function(){
 	if(validMove(this, dir)){
 		turnCheck(dir, this);
 		this.direction = dir;
-		//console.log("Trying to go: " + dir);
-	}*/
+	}
+};
+
+/*
+//Highest move that is valid
+Agent.prototype.makeDecision = function(){
 	
 	var out = [];
 	for(var i=0; i < 4; i++){
@@ -229,7 +233,7 @@ Agent.prototype.makeDecision = function(){
 			break;
 		}
 	}
-};
+};*/
 
 function dirNum(dir, num){
 	this.dir = dir;
@@ -496,7 +500,7 @@ function isCentered(space, dir){
 	return false;
 }
 
-
+var t = 0;
 function draw(){
 	if(!trainingMode){
 		keyCheck(game1);
@@ -506,8 +510,13 @@ function draw(){
 		game1.drawAgents();
 		game1.drawGameData();
 		
-		game2.pacman.network.feedForward();
-		game2.pacman.makeDecision();
+		if(t==10){
+			game2.pacman.network.feedForward(game2);
+			game2.pacman.makeDecision();
+			t=0;
+		}
+		t++;
+		
 		game2.updateAgentsLocation();
 		game2.drawAgents();
 		game2.drawGameData();
@@ -524,7 +533,9 @@ function setup(){
 	var origin2 = new Location(width - div2.scrollWidth,0);
 	
 	game1 = new Game(origin1, null, 1);
-	game2 = new Game(origin2, new Network(), 2);
+	var chrom = new Chromosome();
+	//console.log(chrom);
+	game2 = new Game(origin2, new Network(chrom), 2);
 	
 	game1.changeMode(RESET);
 	game2.changeMode(RESET);
@@ -589,8 +600,6 @@ function newLife(game){
 	stopwatch1 = setInterval(function(){
 		game1.timer++;
 		game2.timer++
-		console.log(game1.timer);
-		console.log(game2.timer);
 		
 		if(game1.timer == 7 || game1.timer == 34 || game1.timer == 59 || game1.timer == 84){
 			game1.changeMode(CHASE);
@@ -744,16 +753,16 @@ document.addEventListener("keypress", function(e){
 		
 			loop();
 			newLife(game1);
-			console.log("newLife")
+			console.log("newLife 1")
 		}
 		else if(e.keyCode == 13 && game2.mode == RESET){
 			loop();
 			newLife(game2);
-			console.log("newLife")
+			console.log("newLife 2")
 		}
 	}
 	else{
 		console.log("Starting Generation");
-		train(500, 100);
+		train(200, 100);
 	}
 });
