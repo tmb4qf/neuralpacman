@@ -65,9 +65,9 @@ function Game(origin, network, id){
 	this.id = id;
 	this.pacman = new Agent(this, squareToPixels(origin, PACMAN_START), 0, 4, '#FFFB14', 0, pacmanTrav, null, 0, 0, null, network);
 	this.blinky = new Agent(this, squareToPixels(origin, BLINKY_START), 0, 4, '#FF1212', SCATTER, ghostTrav, blinkyAlgo, 0, 26, null, null);
-	this.pinky = new Agent(this, squareToPixels(origin, PINKY_START), 0, 1, '#FFA8C7', SCATTER, ghostTrav, pinkyAlgo, 0, 2, null, null);
-	this.inky = new Agent(this, squareToPixels(origin, INKY_START), 0, 2, '#78FFFE', SCATTER, ghostTrav, inkyAlgo, 0, 979, 1, null);
-	this.clyde = new Agent(this, squareToPixels(origin, CLYDE_START), 0, 4, '#FFC17D', SCATTER, ghostTrav, clydeAlgo, 0, 952, 1, null);
+	//this.pinky = new Agent(this, squareToPixels(origin, PINKY_START), 0, 1, '#FFA8C7', SCATTER, ghostTrav, pinkyAlgo, 0, 2, null, null);
+	//this.inky = new Agent(this, squareToPixels(origin, INKY_START), 0, 2, '#78FFFE', SCATTER, ghostTrav, inkyAlgo, 0, 979, 1, null);
+	//this.clyde = new Agent(this, squareToPixels(origin, CLYDE_START), 0, 4, '#FFC17D', SCATTER, ghostTrav, clydeAlgo, 0, 952, 1, null);
 	
 	this.origin = origin;
 	this.dots;
@@ -81,17 +81,17 @@ function Game(origin, network, id){
 Game.prototype.updateAgentsLocation = function(){
 	this.pacman.updateLocation();
 	this.blinky.updateLocation();
-	this.pinky.updateLocation();
-	this.inky.updateLocation();
-	this.clyde.updateLocation();
+	//this.pinky.updateLocation();
+	//this.inky.updateLocation();
+	//this.clyde.updateLocation();
 }
 
 Game.prototype.drawAgents = function(){
 	this.pacman.draw();
 	this.blinky.draw();
-	this.pinky.draw();
-	this.inky.draw();
-	this.clyde.draw();
+	//this.pinky.draw();
+	//this.inky.draw();
+	//this.clyde.draw();
 }
 
 Game.prototype.drawGameData = function(){
@@ -105,48 +105,48 @@ Game.prototype.changeMode = function(mode){
 	this.mode = mode;
 	this.pacman.mode = mode;
 	this.blinky.mode = mode;
-	this.pinky.mode = mode;
-	this.inky.mode = mode;
-	this.clyde.mode = mode;
+	//this.pinky.mode = mode;
+	//this.inky.mode = mode;
+	//this.clyde.mode = mode;
 	
 	if(mode == FRIGHTENED){
 		this.blinky.color = '#2F1CFF';
-		this.pinky.color = '#2F1CFF';
-		this.inky.color = '#2F1CFF';
-		this.clyde.color = '#2F1CFF';
+		//this.pinky.color = '#2F1CFF';
+		//this.inky.color = '#2F1CFF';
+		//this.clyde.color = '#2F1CFF';
 		
 		this.pacman.velocity = 90;
 		this.blinky.velocity = 50;
-		this.pinky.velocity = 50;
-		this.inky.velocity = 50;
-		this.clyde.velocity = 50;
+		//this.pinky.velocity = 50;
+		//this.inky.velocity = 50;
+		//this.clyde.velocity = 50;
 	}
 	else if(mode == CHASE || mode == SCATTER){
 		this.blinky.color = '#FF1212';
-		this.pinky.color = '#FFA8C7';
-		this.inky.color = '#78FFFE';
-		this.clyde.color = '#FFC17D';
+		//this.pinky.color = '#FFA8C7';
+		//this.inky.color = '#78FFFE';
+		//this.clyde.color = '#FFC17D';
 		
 		this.pacman.velocity = 80;
 		this.blinky.velocity = 75;
-		this.pinky.velocity = 75;
-		this.inky.velocity = 75;
-		this.clyde.velocity = 75;
+		//this.pinky.velocity = 75;
+		//this.inky.velocity = 75;
+		//this.clyde.velocity = 75;
 	}
 	else if(mode == RESET){
 		this.pacman.velocity = 0;
 		this.blinky.velocity = 0;
-		this.pinky.velocity = 0;
-		this.inky.velocity = 0;
-		this.clyde.velocity = 0;
+		//this.pinky.velocity = 0;
+		//this.inky.velocity = 0;
+		//this.clyde.velocity = 0;
 	}
 };
 
 Game.prototype.reverseDirection = function(){
 	this.blinky.direction = oppositeDir(this.blinky.direction);
-	this.pinky.direction = oppositeDir(this.pinky.direction);
-	this.inky.direction = oppositeDir(this.inky.direction);
-	this.clyde.direction = oppositeDir(this.clyde.direction);
+	//this.pinky.direction = oppositeDir(this.pinky.direction);
+	//this.inky.direction = oppositeDir(this.inky.direction);
+	//this.clyde.direction = oppositeDir(this.clyde.direction);
 };
 
 
@@ -197,6 +197,7 @@ Agent.prototype.draw = function(){
 	ellipse(this.location.x, this.location.y, AGENT_SIZE, AGENT_SIZE);
 };
 
+/*
 //Highest Move regardless
 Agent.prototype.makeDecision = function(){
 	var out = this.network.output;
@@ -213,9 +214,9 @@ Agent.prototype.makeDecision = function(){
 		turnCheck(dir, this);
 		this.direction = dir;
 	}
-};
+};*/
 
-/*
+
 //Highest move that is valid
 Agent.prototype.makeDecision = function(){
 	
@@ -233,7 +234,7 @@ Agent.prototype.makeDecision = function(){
 			break;
 		}
 	}
-};*/
+};
 
 function dirNum(dir, num){
 	this.dir = dir;
@@ -500,7 +501,6 @@ function isCentered(space, dir){
 	return false;
 }
 
-var t = 0;
 function draw(){
 	if(!trainingMode){
 		keyCheck(game1);
@@ -510,12 +510,8 @@ function draw(){
 		game1.drawAgents();
 		game1.drawGameData();
 		
-		if(t==10){
-			game2.pacman.network.feedForward(game2);
-			game2.pacman.makeDecision();
-			t=0;
-		}
-		t++;
+		game2.pacman.network.feedForward(game2);
+		game2.pacman.makeDecision();
 		
 		game2.updateAgentsLocation();
 		game2.drawAgents();
@@ -535,7 +531,6 @@ function setup(){
 	game1 = new Game(origin1, null, 1);
 	
 	var chrom = new Chromosome();
-	console.log(chrom);
 	game2 = new Game(origin2, new Network(chrom), 2);
 	
 	game1.changeMode(RESET);
